@@ -1,0 +1,6 @@
+This is a starter project for a custom kernel.
+
+To create the boot loader image and run a VM on QEMU:
+cd boot/
+make packages
+make virt
