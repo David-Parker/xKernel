@@ -12,7 +12,7 @@ _main:
 
 _start:
     xor ax,ax      ; We want a segment of 0 for DS for this question
-    mov ds,ax      ;     Set AX to appropriate segment value for your situation
+    mov ds,ax      ; Set AX to appropriate segment value for your situation
     mov es,ax      ; In this case we'll default to ES=DS
     mov bx,0x8000  ; Stack segment can be any usable memory
 
