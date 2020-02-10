@@ -8,7 +8,7 @@ packages:
 	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin bcc
 
 virt: bootloader.iso
-	qemu-system-x86_64 -cdrom ../bin/iso/myos.iso
+	qemu-system-x86_64 -cdrom ../bin/iso/myos.iso -drive file=../bin/bootloader.bin,index=0
 
 bootloader.iso: bootloader.bin
 	mkdir -p ../bin/iso

@@ -11,27 +11,42 @@ _main:
     jmp _start
 
 _start:
-    xor ax,ax      ; We want a segment of 0 for DS for this question
-    mov ds,ax      ; Set AX to appropriate segment value for your situation
-    mov es,ax      ; In this case we'll default to ES=DS
-    mov bx,0x8000  ; Stack segment can be any usable memory
+    cli
+    mov ax,0
+    mov ds,ax
+    mov es,ax
+    mov bx, 0x8000
 
-    cli            ; Disable interrupts to circumvent bug on early 8088 CPUs
-    mov ss,bx      ; This places it with the top of the stack @ 0x80000.
-    mov sp,ax      ; Set SP=0 so the bottom of stack will be @ 0x8FFFF
-    sti            ; Re-enable interrupts
+    mov ss,bx   ; Stack segment
+    mov sp,ax       ; Stack 0x80000 (top) - 0x8FFFF (bottom)
+    sti
 
     cld            ; Set the direction flag to be positive direction
 
-    push msg
+    push MSG_START
     call print
+    sub sp, 2 ; arg pop (msg)
+
+    ; [es:bx] = address for loaded disk sector
+    mov bx, 0x9000
+    push 1 ; load 1 more sector
+    call load_disk
+    sub sp, 2
+    
+    push bx
+    call print
+    sub sp, 2
 
     jmp $ ; infinite loop
 
-    %include "file.asm"
+    %include "print.asm"
+    %include "disk.asm"
 
-    msg db "Hello, world!",10,13,0
+    MSG_START: db "Starting kernel boot.",10,13,0
 
 ; padding and magic number
 times 510 - ($-$$) db 0
 dw 0xaa55 
+
+; sector 2
+db "Hello, from another sector!",10,13,0
