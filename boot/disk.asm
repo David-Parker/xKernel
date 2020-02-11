@@ -24,7 +24,7 @@ load_disk:
 
 disk_error:
     push MSG_DISK_ERROR
-    call print
+    call print_16
     sub sp, 2
     jmp $
 
