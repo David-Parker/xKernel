@@ -2,7 +2,17 @@
 void dummy_test_entrypoint() {
 }
 
-void main() {
+void kprint(char* str)
+{
     char* video_memory = (char*) 0xb8000;
-    *video_memory = 'X';
+
+    while (*str != 0)
+    {
+        *(video_memory) = *str++;
+        video_memory+=2;
+    }
+}
+
+void main() {
+    kprint("Kernel has been loaded into memory.\n");
 }
