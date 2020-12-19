@@ -16,7 +16,7 @@ $(shell rm -rf $(DIRS))
 $(shell mkdir -p $(DIRS))
 
 # First rule is run by default
-os-image.bin: boot/bootloader.bin kernel.bin
+os-image.bin: boot/bootloader.bin kernel.bin kernel.elf
 	mv -u **/*.o **/*.bin ${BINDIR}
 	cat ${BINDIR}/bootloader.bin ${BINDIR}/kernel.bin > ${BINDIR}/os-image.bin
 
@@ -44,9 +44,9 @@ run: os-image.bin
 	qemu-system-i386 -fda ${BINDIR}/os-image.bin
 
 # Open the connection to qemu and load our kernel-object file with symbols
-debug: os-image.bin kernel.elf
-	qemu-system-i386 -s -fda ${BINDIR}/os-image.bin &
-	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+debug: os-image.bin
+	qemu-system-i386 -s -S -fda ${BINDIR}/os-image.bin &
+	${GDB} -ex "target remote localhost:1234" -ex "symbol-file $(BINDIR)/kernel.elf"
 
 # Generic rules for wildcards
 # To make an object, always compile from its .c
