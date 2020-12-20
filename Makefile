@@ -18,7 +18,9 @@ $(shell mkdir -p $(DIRS))
 
 # First rule is run by default
 os-image.bin: boot/bootloader.bin kernel.bin kernel.elf
-	mv -u **/*.o **/*.bin ${BINDIR}
+	find . -type f -name "*.o" -exec mv -i {} ${BINDIR} \;
+	find . -type f -name "*.bin" -exec mv -i {} ${BINDIR} \;
+	find . -type f -name "*.img" -exec mv -i {} ${BINDIR} \;
 	cat ${BINDIR}/bootloader.bin ${BINDIR}/kernel.bin > ${BINDIR}/os-image.bin
 	truncate -s 32K ${BINDIR}/os-image.bin
 
@@ -26,14 +28,13 @@ packages:
 	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin bcc
 
 virt: iso
-	qemu-system-i386 -drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
-	# -cdrom ${BINDIR}/iso/myos.iso
+	qemu-system-i386 -cdrom ${BINDIR}/iso/myos.iso
+	#-drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
 
-# iso file is currently broken
 iso: os-image.bin
-	dd if=/dev/zero of=${BINDIR}/iso/myos.img bs=512 count=64
+	dd if=/dev/zero of=${BINDIR}/iso/myos.img bs=1024 count=2880
 	dd if=${BINDIR}/os-image.bin of=${BINDIR}/iso/myos.img seek=0 conv=notrunc
-	genisoimage -quiet -V 'MYOS' -no-emul-boot -boot-load-size 64 -boot-info-table -input-charset iso8859-1 -o ${BINDIR}/iso/myos.iso -b myos.img -hide myos.img ${BINDIR}/iso/
+	genisoimage -quiet -V 'MYOS' -input-charset iso8859-1 -o ${BINDIR}/iso/myos.iso -b myos.img -hide myos.img ${BINDIR}/iso/
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case

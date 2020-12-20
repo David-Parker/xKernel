@@ -8,3 +8,8 @@ void memcopy(char *source, char *dest, int nbytes)
         *(dest + i) = *(source + i);
     }
 }
+
+void halt()
+{
+    __asm__("hlt");
+}
