@@ -1,12 +1,14 @@
 #include <kernel/hw/console.h>
 #include <kernel/hw/ports.h>
 #include <kernel/mem/phymem.h>
+#include <kernel/util/util.h>
 
 int get_cursor_index(int row, int col);
 PSCREEN get_screen_addr(int row, int col);
 int get_cursor_pos();
 void set_cursor_pos(int index);
 void vga_clamp();
+void scroll_screen();
 
 int get_cursor_index(int row, int col)
 {
@@ -59,10 +61,19 @@ void vga_clamp()
         vga_col_curr = 0;
         vga_row_curr++;
     }
-    if (vga_row_curr >= VGA_MAX_ROWS)
+    if (vga_row_curr >= VGA_MAX_ROWS - 1) // Always leave last line blank
     {
-        vga_row_curr = 0;
+        scroll_screen();
+        vga_row_curr = VGA_MAX_ROWS - 2;
     }
+}
+
+void scroll_screen()
+{
+    PSCREEN screen = get_screen_addr(vga_row_curr, vga_col_curr);
+    PSCREEN src = get_screen_addr(1,0);
+    PSCREEN dest = get_screen_addr(0,0);
+    memcopy(src, dest, (screen - PHY_VGA_MEM_START));
 }
 
 void console_init()
