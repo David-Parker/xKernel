@@ -64,5 +64,7 @@ debug: os-image.bin
 	nasm $< -f bin -o $@
 
 clean:
-	rm -rf *.bin *.dis *.o os-image.bin *.elf
+	find . -type f -name "*.o" -delete
+	find . -type f -name "*.bin" -delete
+	find . -type f -name "*.img" -delete
 	rm -rf bin

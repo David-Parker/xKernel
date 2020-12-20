@@ -1,8 +1,18 @@
-#include <kernel/util/printf.h>
-#include <kernel/util/util.h>
+#include <kernel/util/iolib.h>
 
 const char charMapLower[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 const char charMapUpper[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+void kprint(char* str)
+{
+    char* video_memory = (char*) 0xb8000;
+
+    while (*str != 0)
+    {
+        *(video_memory) = *str++;
+        video_memory+=2;
+    }
+}
 
 void reverse(char str[], int length)
 {
@@ -140,15 +150,15 @@ char* lltoa_unsigned(char* destination, char* end, unsigned long long c, int bas
     }
 }
 
-void printf(const char *fmt, ...)
+void kprintf(const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	vprintf(fmt, args);
+	vkprintf(fmt, args);
 	va_end(args);
 }
 
-void vprintf(const char *fmt, va_list args)
+void vkprintf(const char *fmt, va_list args)
 {
 	char buffer[PRINTF_BUFFER_MAX] = {0};
 	char* pBuf = buffer;
