@@ -1,28 +1,8 @@
-#include <kernel/util/iolib.h>
-#include <kernel/drivers/ports.h>
+#include <kernel/io/iolib.h>
+#include <kernel/hw/console.h>
 
 const char charMapLower[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 const char charMapUpper[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-void kprint(char* str)
-{
-	write_port_byte(0x3d4, 14);
-    int position = read_port_byte(0x3d5);
-    position = position << 8;
-    write_port_byte(0x3d4, 15);
-    position += read_port_byte(0x3d5);
-
-    int offset_from_vga = position * 2;
-
-    char* video_memory = (char*) (0xb8000 + offset_from_vga);
-
-    while (*str != 0)
-    {
-        *(video_memory) = *str++;
-		*(video_memory+1) = 0x0f;
-        video_memory+=2;
-    }
-}
 
 void reverse(char str[], int length)
 {

@@ -31,9 +31,9 @@ virt: iso
 
 # iso file is currently broken
 iso: os-image.bin
-	dd if=/dev/zero of=${BINDIR}/iso/myos.img bs=512 count=4096
+	dd if=/dev/zero of=${BINDIR}/iso/myos.img bs=512 count=64
 	dd if=${BINDIR}/os-image.bin of=${BINDIR}/iso/myos.img seek=0 conv=notrunc
-	genisoimage -quiet -V 'MYOS' -no-emul-boot -boot-load-size 4096 -boot-info-table -input-charset iso8859-1 -o ${BINDIR}/iso/myos.iso -b myos.img -hide myos.img ${BINDIR}/iso/
+	genisoimage -quiet -V 'MYOS' -no-emul-boot -boot-load-size 64 -boot-info-table -input-charset iso8859-1 -o ${BINDIR}/iso/myos.iso -b myos.img -hide myos.img ${BINDIR}/iso/
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case

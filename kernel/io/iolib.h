@@ -4,7 +4,6 @@
 #include <kernel/util/stddef.h>
 #define PRINTF_BUFFER_MAX 4096
 
-void kprint(char* str);
 void reverse(char str[], int length);
 char* safe_copy_str(char *destination, const char *source, char *end);
 char* safe_copy_char(char* destination, const char c, char* end);
