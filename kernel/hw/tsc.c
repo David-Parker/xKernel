@@ -4,7 +4,7 @@
 #include <kernel/hw/time.h>
 #include <kernel/io/iolib.h>
 
-static _u64 g_cycles_hz_measured = 0;
+static _u64 g_cycles_hz = 0;
 
 // All about TSC: https://unix4lyfe.org/benchmarking/
 _u64 read_tscp()
@@ -45,15 +45,26 @@ int rdtscp_supported() {
 
 _u64 get_tsc_freq()
 {
+    if (g_cycles_hz != 0)
+    {
+        return g_cycles_hz;
+    }
+
     if (msr_supported()) // 1) Try MSR
     {
         _u64 msr = read_msr(MSR_PLATFORM_INFO);
 
         if (msr > 0)
         {
-            _u16 base_ratio = (msr >> 8) & 0xFF;
+            _u64 base_ratio = msr & 0xFF00;
 
-            return base_ratio * 1000000 * 100;
+            _u64 hz = base_ratio * 1000000 * 100;
+
+            if (hz > 0)
+            {
+                g_cycles_hz = hz;
+                return g_cycles_hz;
+            }
         }
     }
 
@@ -63,15 +74,12 @@ _u64 get_tsc_freq()
     if (a >= 0x15) // 2) Try CPUID
     {
         call_cpuid(0x15, 0, &a, &b, &c, &d);
-        return ((_u64)c)*b/a;
+
+        g_cycles_hz = ((_u64)c)*b/a;
+        return g_cycles_hz;
     }
     else // 3) Measure
     {
-        if (g_cycles_hz_measured != 0)
-        {
-            return g_cycles_hz_measured;
-        }
-
         _u64 cycles_hz = 0;
         _u64 gap = 0;
         _u32 index;
@@ -114,8 +122,8 @@ _u64 get_tsc_freq()
         //     }
         // }
 
-        g_cycles_hz_measured = cycles_hz;
+        g_cycles_hz = cycles_hz;
 
-        return g_cycles_hz_measured;
+        return g_cycles_hz;
     }
 }

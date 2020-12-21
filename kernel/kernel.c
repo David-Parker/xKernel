@@ -8,7 +8,6 @@
 void main() {
     console_init();
     kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
-    kprintf("New line\n");
 
     _u64 tsc_freq = get_tsc_freq();
 

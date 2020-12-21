@@ -1,5 +1,6 @@
 #include <kernel/hw/msr.h>
 #include <kernel/hw/cpuid.h>
+#include <kernel/io/iolib.h>
 
 bool msr_supported() {
     _u32 a = 0;
@@ -34,5 +35,9 @@ _u64 read_msr(_u32 msr)
             "c" (msr)
     );
 
-    return (((_u64)edx) << 32 | ((_u64)eax & 0xFFFFFFFF));
+    _u64 result = edx;
+    result <<= 32;
+    result += eax;
+
+    return result;
 }
