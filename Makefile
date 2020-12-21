@@ -28,7 +28,8 @@ packages:
 	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin bcc
 
 virt: iso
-	qemu-system-i386 -enable-kvm -cpu host -cdrom ${BINDIR}/iso/myos.iso
+	qemu-system-i386 -cpu qemu32,+tsc,+msr,+invtsc -cdrom ${BINDIR}/iso/myos.iso
+	#sudo qemu-system-i386 -enable-kvm -cpu max -cdrom ${BINDIR}/iso/myos.iso
 	#-drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
 
 iso: os-image.bin

@@ -1,8 +1,10 @@
 #include <kernel/hw/tsc.h>
 #include <kernel/hw/msr.h>
+#include <kernel/hw/cpuid.h>
 #include <kernel/hw/time.h>
 #include <kernel/io/iolib.h>
-#include <kernel/util/util.h>
+
+static _u64 g_cycles_hz_measured = 0;
 
 // All about TSC: https://unix4lyfe.org/benchmarking/
 _u64 read_tscp()
@@ -27,7 +29,7 @@ _u64 read_tsc()
 
 int rdtscp_supported() {
     unsigned a, b, c, d;
-    call_cpuid(0x80000001, &a, &b, &c, &d);
+    call_cpuid(0x80000001, 0, &a, &b, &c, &d);
 
     if (d & (1 << 27))
     {
@@ -43,51 +45,77 @@ int rdtscp_supported() {
 
 _u64 get_tsc_freq()
 {
-    _u64 msr = read_msr(MSR_PLATFORM_INFO);
+    if (msr_supported()) // 1) Try MSR
+    {
+        _u64 msr = read_msr(MSR_PLATFORM_INFO);
 
-    _u16 bus_freq = (msr & 0xFF00) >> 8;
+        if (msr > 0)
+        {
+            _u16 base_ratio = (msr >> 8) & 0xFF;
 
-    return bus_freq * 100000000;
+            return base_ratio * 1000000 * 100;
+        }
+    }
 
+    unsigned a, b, c, d;
+    call_cpuid(0x00, 0, &a, &b, &c, &d);
 
-    // _u64 cyclesPerSec = 0;
-    // _u64 gap = 0;
-    // _u32 index;
-    // _u64 time;
-    // _u64 time1;
-    // _u64 time2;
-    // _u64 tsc0;
-    // _u64 tsc1;
-    // _u64 tsc2;
+    if (a >= 0x15) // 2) Try CPUID
+    {
+        call_cpuid(0x15, 0, &a, &b, &c, &d);
+        return ((_u64)c)*b/a;
+    }
+    else // 3) Measure
+    {
+        if (g_cycles_hz_measured != 0)
+        {
+            return g_cycles_hz_measured;
+        }
 
-    // for (index = 0; index < 3; index += 1)
-    // {
-    //     tsc0 = read_tsc();
-    //     time = ktime_get_ns();
+        _u64 cycles_hz = 0;
+        _u64 gap = 0;
+        _u32 index;
+        _u64 time;
+        _u64 time1;
+        _u64 time2;
+        _u64 tsc0;
+        _u64 tsc1;
+        _u64 tsc2;
 
-    //     do {
-    //         time1 = ktime_get_ns();
-    //     } while (time1 == time);
+        // TODO: temp tsc "guess" until we can measure
+        cycles_hz = 3500000000ull;
 
-    //     tsc1 = read_tsc();
+        // for (index = 0; index < 3; index += 1)
+        // {
+        //     tsc0 = read_tsc();
+        //     time = ktime_get_ns();
 
-    //     do {
-    //         time2 = ktime_get_ns();
-    //     } while (time2 - time1 < 1 * NANOS_PER_SEC);
+        //     do {
+        //         time1 = ktime_get_ns();
+        //     } while (time1 == time);
 
-    //     tsc2 = read_tsc();
+        //     tsc1 = read_tsc();
 
-    //     if ((gap == 0) ||
-    //         ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
+        //     do {
+        //         time2 = ktime_get_ns();
+        //     } while (time2 - time1 < 1 * NANOS_PER_SEC);
 
-    //         gap = tsc2 - tsc0;
-    //         cyclesPerSec = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
+        //     tsc2 = read_tsc();
 
-    //         // round to nearest mhz
-    //         cyclesPerSec += 1000000 / 2;
-    //         cyclesPerSec -= (cyclesPerSec % 1000000);
-    //     }
-    // }
+        //     if ((gap == 0) ||
+        //         ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
 
-    // return cyclesPerSec;
+        //         gap = tsc2 - tsc0;
+        //         cyclesPerSec = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
+
+        //         // round to nearest mhz
+        //         cyclesPerSec += 1000000 / 2;
+        //         cyclesPerSec -= (cyclesPerSec % 1000000);
+        //     }
+        // }
+
+        g_cycles_hz_measured = cycles_hz;
+
+        return g_cycles_hz_measured;
+    }
 }

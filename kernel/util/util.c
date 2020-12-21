@@ -13,21 +13,3 @@ void halt()
 {
     __asm__("hlt");
 }
-
-void call_cpuid(
-    unsigned int cpuid,
-    unsigned int* eax,
-    unsigned int* ecx,
-    unsigned int* ebx,
-    unsigned int* edx)
-{
-    __asm__(
-        "cpuid"
-        : 
-            "=a" (*eax),
-            "=b" (*ebx),
-            "=c" (*ecx),
-            "=d" (*edx)
-        : 
-            "a" (cpuid));
-}
