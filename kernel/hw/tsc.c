@@ -1,4 +1,5 @@
 #include <kernel/hw/tsc.h>
+#include <kernel/hw/msr.h>
 #include <kernel/hw/time.h>
 #include <kernel/io/iolib.h>
 #include <kernel/util/util.h>
@@ -42,44 +43,51 @@ int rdtscp_supported() {
 
 _u64 get_tsc_freq()
 {
-    _u64 cyclesPerSec = 0;
-    _u64 gap = 0;
-    _u32 index;
-    _u64 time;
-    _u64 time1;
-    _u64 time2;
-    _u64 tsc0;
-    _u64 tsc1;
-    _u64 tsc2;
+    _u64 msr = read_msr(MSR_PLATFORM_INFO);
 
-    for (index = 0; index < 3; index += 1)
-    {
-        tsc0 = read_tsc();
-        time = ktime_get_ns();
+    _u16 bus_freq = (msr & 0xFF00) >> 8;
 
-        do {
-            time1 = ktime_get_ns();
-        } while (time1 == time);
+    return bus_freq * 100000000;
 
-        tsc1 = read_tsc();
 
-        do {
-            time2 = ktime_get_ns();
-        } while (time2 - time1 < 1 * NANOS_PER_SEC);
+    // _u64 cyclesPerSec = 0;
+    // _u64 gap = 0;
+    // _u32 index;
+    // _u64 time;
+    // _u64 time1;
+    // _u64 time2;
+    // _u64 tsc0;
+    // _u64 tsc1;
+    // _u64 tsc2;
 
-        tsc2 = read_tsc();
+    // for (index = 0; index < 3; index += 1)
+    // {
+    //     tsc0 = read_tsc();
+    //     time = ktime_get_ns();
 
-        if ((gap == 0) ||
-            ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
+    //     do {
+    //         time1 = ktime_get_ns();
+    //     } while (time1 == time);
 
-            gap = tsc2 - tsc0;
-            cyclesPerSec = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
+    //     tsc1 = read_tsc();
 
-            // round to nearest mhz
-            cyclesPerSec += 1000000 / 2;
-            cyclesPerSec -= (cyclesPerSec % 1000000);
-        }
-    }
+    //     do {
+    //         time2 = ktime_get_ns();
+    //     } while (time2 - time1 < 1 * NANOS_PER_SEC);
 
-    return cyclesPerSec;
+    //     tsc2 = read_tsc();
+
+    //     if ((gap == 0) ||
+    //         ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
+
+    //         gap = tsc2 - tsc0;
+    //         cyclesPerSec = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
+
+    //         // round to nearest mhz
+    //         cyclesPerSec += 1000000 / 2;
+    //         cyclesPerSec -= (cyclesPerSec % 1000000);
+    //     }
+    // }
+
+    // return cyclesPerSec;
 }

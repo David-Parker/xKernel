@@ -23,9 +23,11 @@ void call_cpuid(
 {
     __asm__(
         "cpuid"
-        : "=a" (*eax),
-        "=b" (*ebx),
-        "=c" (*ecx),
-        "=d" (*edx)
-        : "0" (cpuid));
+        : 
+            "=a" (*eax),
+            "=b" (*ebx),
+            "=c" (*ecx),
+            "=d" (*edx)
+        : 
+            "a" (cpuid));
 }

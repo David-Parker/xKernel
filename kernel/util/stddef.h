@@ -8,3 +8,4 @@
 #define MILLIS_PER_SEC 1000
 typedef unsigned long long _u64;
 typedef unsigned int _u32;
+typedef unsigned short _u16;

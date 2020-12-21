@@ -5,8 +5,8 @@
 void memcopy(char *source, char *dest, int nbytes);
 void halt();
 void call_cpuid(
-    unsigned int cpuid,
-    unsigned int* eax,
-    unsigned int* ecx,
-    unsigned int* ebx,
-    unsigned int* edx);
+    _u32 cpuid,
+    _u32* eax,
+    _u32* ecx,
+    _u32* ebx,
+    _u32* edx);
