@@ -25,7 +25,7 @@ int get_cursor_index(int row, int col)
 
 PSCREEN get_screen_addr(int row, int col)
 {
-    return PHY_VGA_MEM_START + (get_cursor_index(row, col))*2;
+    return (PSCREEN) (PHY_VGA_MEM_START + (get_cursor_index(row, col))*2);
 }
 
 int get_cursor_pos()
@@ -73,7 +73,7 @@ void scroll_screen()
     PSCREEN screen = get_screen_addr(vga_row_curr, vga_col_curr);
     PSCREEN src = get_screen_addr(1,0);
     PSCREEN dest = get_screen_addr(0,0);
-    memcopy(src, dest, (screen - PHY_VGA_MEM_START));
+    memcopy(src, dest, (int)(screen - PHY_VGA_MEM_START));
 }
 
 void console_init()
