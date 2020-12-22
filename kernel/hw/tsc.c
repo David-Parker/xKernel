@@ -2,7 +2,7 @@
 #include <kernel/hw/msr.h>
 #include <kernel/hw/cpuid.h>
 #include <kernel/hw/time.h>
-#include <kernel/io/iolib.h>
+#include <kernel/lib/iolib.h>
 
 static _u64 g_cycles_hz = 0;
 

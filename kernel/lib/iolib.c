@@ -1,4 +1,4 @@
-#include <kernel/io/iolib.h>
+#include <kernel/lib/iolib.h>
 #include <kernel/hw/console.h>
 
 const char charMapLower[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -137,6 +137,16 @@ char* lltoa_unsigned(char* destination, char* end, unsigned long long c, int bas
     else
     {
         return NULL;
+    }
+}
+
+void kprint(char* str)
+{
+    char c;
+    
+    while ((c = *str++) != 0)
+    {
+        console_putc(c);
     }
 }
 

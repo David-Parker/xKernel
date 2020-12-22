@@ -1,4 +1,4 @@
-#include <kernel/io/iolib.h>
+#include <kernel/lib/iolib.h>
 #include <kernel/util/util.h>
 #include <kernel/hw/console.h>
 #include <kernel/hw/tsc.h>

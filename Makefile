@@ -28,7 +28,7 @@ packages:
 	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin bcc
 
 virt: iso
-	qemu-system-i386 -cpu qemu32,+tsc,+msr,+invtsc -cdrom ${BINDIR}/iso/myos.iso
+	sudo qemu-system-i386 -enable-kvm -cpu host,+tsc,+msr,+invtsc -cdrom ${BINDIR}/iso/myos.iso
 	#sudo qemu-system-i386 -enable-kvm -cpu max -cdrom ${BINDIR}/iso/myos.iso
 	#-drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
 
@@ -36,6 +36,7 @@ iso: os-image.bin
 	dd if=/dev/zero of=${BINDIR}/iso/myos.img bs=1024 count=2880
 	dd if=${BINDIR}/os-image.bin of=${BINDIR}/iso/myos.img seek=0 conv=notrunc
 	genisoimage -quiet -V 'MYOS' -input-charset iso8859-1 -o ${BINDIR}/iso/myos.iso -b myos.img -hide myos.img ${BINDIR}/iso/
+	# -no-emul-boot -boot-load-size 64 -boot-info-table
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
