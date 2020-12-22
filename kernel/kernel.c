@@ -3,10 +3,13 @@
 #include <kernel/hw/console.h>
 #include <kernel/hw/tsc.h>
 #include <kernel/hw/msr.h>
+#include <kernel/cpu/gdt.h>
 
 // Kernel entry is jumped to from boot loader after enabling 32-bit prot execution. At this time virtual memory paging is not enabled.
 void main() {
+    gdt_init();
     console_init();
+    
     kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
 
     _u64 tsc_freq = get_tsc_freq();

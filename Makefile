@@ -1,7 +1,8 @@
 C_SOURCES = $(wildcard **/*.c) $(wildcard **/**/*.c)
+ASM_SOURCES = $(wildcard **/*.s) $(wildcard **/**/*.s)
 HEADERS = $(wildcard **/*.h) $(wildcard **/**/*.h)
 # Nice syntax for file extension replacement
-OBJ = ${C_SOURCES:.c=.o}
+OBJ = ${ASM_SOURCES:.s=.o} ${C_SOURCES:.c=.o}
 BINDIR = ./bin/x86
 
 # Change this if your cross-compiler is somewhere else
@@ -59,6 +60,9 @@ debug: os-image.bin
 # To make an object, always compile from its .c
 %.o: %.c ${HEADERS}
 	${CC} ${CFLAGS} ${INC} -ffreestanding -c $< -o $@
+
+%.o: %.s ${HEADERS}
+	nasm $< -f elf -o $@
 
 %.o: %.asm
 	nasm $< -f elf -o $@
