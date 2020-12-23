@@ -142,6 +142,11 @@ char* lltoa_unsigned(char* destination, char* end, unsigned long long c, int bas
 
 void kprint(char* str)
 {
+	if (str == NULL)
+	{
+		return;
+	}
+	
     char c;
     
     while ((c = *str++) != 0)
@@ -154,15 +159,24 @@ void kprintf(const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	vkprintf(fmt, args);
+	char buffer[PRINTF_BUFFER_MAX] = {0};
+	vkprintf(fmt, buffer, PRINTF_BUFFER_MAX, args);
+	va_end(args);
+	kprint(buffer);
+}
+
+void ksprintf(const char *fmt, char* buffer, int len, ...)
+{
+	va_list args;
+	va_start(args, len);
+	vkprintf(fmt, buffer, len, args);
 	va_end(args);
 }
 
-void vkprintf(const char *fmt, va_list args)
+static void vkprintf(const char *fmt, char* buffer, int len, va_list args)
 {
-	char buffer[PRINTF_BUFFER_MAX] = {0};
 	char* pBuf = buffer;
-	char* pEndBuf = &buffer[PRINTF_BUFFER_MAX - 1];
+	char* pEndBuf = &buffer[len - 1];
 
 	while (*fmt != '\0')
 	{
@@ -251,17 +265,14 @@ void vkprintf(const char *fmt, va_list args)
 		++fmt;
 	}
 
-	int accum = 0;
 	int bufLen = pBuf - buffer;
 
-	if (bufLen == PRINTF_BUFFER_MAX)
+	if (bufLen == len)
 	{
-		buffer[PRINTF_BUFFER_MAX - 1] = '\0';
+		buffer[len - 1] = '\0';
 	}
 	else
 	{
 		buffer[bufLen] = '\0';
 	}
-
-	kprint(buffer);
 }

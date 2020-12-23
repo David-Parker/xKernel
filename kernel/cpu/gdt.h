@@ -4,6 +4,7 @@
 
 // Global Descriptor Table
 // More about GDT http://www.jamesmolloy.co.uk/tutorial_html/4.-The%20GDT%20and%20IDT.html
+// and https://stackoverflow.com/questions/23978486/far-jump-in-gdt-in-bootloader
 #define GDT_ACCESS_SEG_PRESENT 0b10000000
 #define GDT_ACCESS_PRIV_RING_0 0b00000000
 #define GDT_ACCESS_PRIV_RING_1 0b00100000
@@ -34,9 +35,9 @@ typedef struct
    _u16 limit;               // The upper 16 bits of all selector limits.
    _u32 base;                // The address of the first gdt_entry_t struct.
 }
-__attribute__((packed)) gdt_t;
+__attribute__((packed)) gdt_register_t;
 
-gdt_t global_descriptor_table;
+gdt_register_t global_descriptor_table;
 gdt_entry_t gdt_entries[5];
 
 #define GDT_ADDR_SEG_NULL 0x00
@@ -45,6 +46,8 @@ gdt_entry_t gdt_entries[5];
 #define GDT_ADDR_SEG_USER_CODE 0x18
 #define GDT_ADDR_SEG_USER_DATA 0x20
 
-extern _cdecl void gdt_switch_to_kernel_mode(_u32 gdt_addr);
 void gdt_init();
-void gdt_set_gate(_s32 num, _u32 base, _u32 limit, _u8 access, _u8 granularity);
+void gdt_set_entry(_s32 num, _u32 base, _u32 limit, _u8 access, _u8 granularity);
+
+extern _cdecl void gdt_switch_to_kernel_mode(_u32 gdt_addr);
+extern _cdecl void gdt_switch_to_user_mode(_u32 gdt_addr);

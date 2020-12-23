@@ -1,6 +1,6 @@
-C_SOURCES = $(wildcard **/*.c) $(wildcard **/**/*.c)
-ASM_SOURCES = $(wildcard **/*.s) $(wildcard **/**/*.s)
-HEADERS = $(wildcard **/*.h) $(wildcard **/**/*.h)
+C_SOURCES = $(wildcard kernel/*.c) $(wildcard kernel/**/*.c)
+ASM_SOURCES = $(wildcard kernel/*.s) $(wildcard kernel/**/*.s)
+HEADERS = $(wildcard kernel/*.h) $(wildcard kernel/**/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${ASM_SOURCES:.s=.o} ${C_SOURCES:.c=.o}
 BINDIR = ./bin/x86

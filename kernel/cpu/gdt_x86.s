@@ -1,4 +1,4 @@
-[GLOBAL gdt_switch_to_kernel_mode]    ; Allows the C code to call gdt_flush().
+[GLOBAL gdt_switch_to_kernel_mode]
 
 gdt_switch_to_kernel_mode:
    push ebp
@@ -7,12 +7,13 @@ gdt_switch_to_kernel_mode:
    lgdt [eax]        ; Load the new GDT pointer
 
    mov ax, 0x10      ; 0x10 is the offset in the GDT to our data segment
-   mov ds, ax        ; Load all data segment selectors
+   mov ds, ax        ; Load all data segment selectors, since we use paging all segments can access entire memory range
    mov es, ax
    mov fs, ax
    mov gs, ax
    mov ss, ax
    pop ebp
-   jmp 0x08:.flush   ; 0x08 is the offset to our code segment: Far jump!
-.flush:
+   jmp 0x08:.ld_cs   ; Code segment can only be loaded via far jump
+   
+.ld_cs:
    ret
