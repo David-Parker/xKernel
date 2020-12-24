@@ -14,7 +14,6 @@ void main() {
 
     // Divide by zero, this should call the DIV_ZERO IRQ (0) - if no handler is set, CPU will get stuck in a reboot loop
     int x = 2 / 0;
-   // __asm__ ("int $0x00");
     
     kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
 
