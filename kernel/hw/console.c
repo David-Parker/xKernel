@@ -98,6 +98,11 @@ void console_clear()
     }
 }
 
+void console_clear_line(int row)
+{
+    
+}
+
 void console_putc(char c)
 {
     screen_ptr_t video_memory;

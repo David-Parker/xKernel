@@ -1,6 +1,7 @@
 #include <kernel/cpu/idt.h>
 #include <kernel/util/util.h>
 #include <kernel/cpu/intr.h>
+#include <kernel/hw/ioports.h>
 
 void idt_init()
 {
@@ -29,7 +30,7 @@ void idt_init()
     idt_set_entry(IDT_INTR_ALIGN_CHECK_EX, (_u32)isr17, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
     idt_set_entry(IDT_INTR_MACHINE_CHECK_EX, (_u32)isr18, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
 
-    // Reserved IRQs
+    // Reserved Interrupts
     idt_set_entry(19, (_u32)isr19, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
     idt_set_entry(20, (_u32)isr20, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
     idt_set_entry(21, (_u32)isr21, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
@@ -43,6 +44,18 @@ void idt_init()
     idt_set_entry(29, (_u32)isr29, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
     idt_set_entry(30, (_u32)isr30, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
     idt_set_entry(31, (_u32)isr31, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+
+    // Remap IRQ table
+    write_port_byte(0x20, 0x11);
+    write_port_byte(0xA0, 0x11);
+    write_port_byte(0x21, 0x20);
+    write_port_byte(0xA1, 0x28);
+    write_port_byte(0x21, 0x04);
+    write_port_byte(0xA1, 0x02);
+    write_port_byte(0x21, 0x01);
+    write_port_byte(0xA1, 0x01);
+    write_port_byte(0x21, 0x0);
+    write_port_byte(0xA1, 0x0);
 
     idt_set((_u32)&interrupt_descriptor_table);
 }

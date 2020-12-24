@@ -34,4 +34,5 @@ int vga_col_curr;
 
 void console_init();
 void console_clear();
+void console_clear_line(int row);
 void console_putc(char c);

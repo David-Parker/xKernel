@@ -13,7 +13,7 @@ void main() {
     console_init();
 
     // Divide by zero, this should call the DIV_ZERO IRQ (0) - if no handler is set, CPU will get stuck in a reboot loop
-    int x = 2 / 0;
+    //int x = 2 / 0;
     
     kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
 
