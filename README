@@ -9,5 +9,8 @@ make virt
 To debug (with gdb):
 make debug
 
+To run unit tests:
+make test
+
 To create disk image:
 make iso
