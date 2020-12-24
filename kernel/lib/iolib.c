@@ -21,91 +21,91 @@ void reverse(char str[], int length)
 
 char* safe_copy_str(char *destination, const char *source, char *end)
 {
-	while (*source != '\0' && destination != end)
-	{
-		*destination++ = *source++;
-	}
+    while (*source != '\0' && destination != end)
+    {
+        *destination++ = *source++;
+    }
 
-	return destination;
+    return destination;
 }
 
 char* safe_copy_char(char* destination, const char c, char* end)
 {
-	if (destination < end)
-	{
-		*destination++ = c;
-	}
+    if (destination < end)
+    {
+        *destination++ = c;
+    }
 
-	return destination;
+    return destination;
 }
 
 char* itoa(char *destination, char *end, int c, int base)
 {
-	return ltoa(destination, end, c, base);
+    return ltoa(destination, end, c, base);
 }
 
 char* itoa_unsigned(char *destination, char *end, unsigned int c, int base)
 {
-	return ltoa_unsigned(destination, end, c, base);
+    return ltoa_unsigned(destination, end, c, base);
 }
 
 char* ltoa(char* destination, char* end, long c, int base)
 {
-	return lltoa(destination, end, c, base);
+    return lltoa(destination, end, c, base);
 }
 
 char* ltoa_unsigned(char* destination, char* end, unsigned long c, int base)
 {
-	return lltoa_unsigned(destination, end, c, base);
+    return lltoa_unsigned(destination, end, c, base);
 }
 
 char* lltoa(char* destination, char* end, long long c, int base)
 {
-	bool neg = false;
-	int bufferIndex = 0;
-	char buffer[64];
-	long long val = c;
+    bool neg = false;
+    int bufferIndex = 0;
+    char buffer[64];
+    long long val = c;
 
-	if (base <= 16)
-	{
-		if (val == 0)
-		{
-			char zero[] = "0";
-			return safe_copy_str(destination, zero, end);
-		}
-		else if (val < 0)
-		{
-			neg = true;
-			buffer[bufferIndex++] = '-';
-		}
+    if (base <= 16)
+    {
+        if (val == 0)
+        {
+            char zero[] = "0";
+            return safe_copy_str(destination, zero, end);
+        }
+        else if (val < 0)
+        {
+            neg = true;
+            buffer[bufferIndex++] = '-';
+        }
 
-		while (val != 0)
-		{
-			int index = 0;
+        while (val != 0)
+        {
+            int index = 0;
 
-			if (neg)
-				index = ~(val % base) + 1;
-			else
-				index = val % base;
+            if (neg)
+                index = ~(val % base) + 1;
+            else
+                index = val % base;
 
-			char digit = charMapLower[index];
-			buffer[bufferIndex++] = digit;
-			val /= base;
-		}
+            char digit = charMapLower[index];
+            buffer[bufferIndex++] = digit;
+            val /= base;
+        }
 
-		buffer[bufferIndex] = '\0';
+        buffer[bufferIndex] = '\0';
 
-		if (neg)
-			reverse(buffer + 1, bufferIndex - 1);
-		else
-			reverse(buffer, bufferIndex);
+        if (neg)
+            reverse(buffer + 1, bufferIndex - 1);
+        else
+            reverse(buffer, bufferIndex);
 
-		return safe_copy_str(destination, buffer, end);
-	}
-	else
-	{
-		return NULL;
-	}
+        return safe_copy_str(destination, buffer, end);
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 char* lltoa_unsigned(char* destination, char* end, unsigned long long c, int base)
@@ -142,11 +142,11 @@ char* lltoa_unsigned(char* destination, char* end, unsigned long long c, int bas
 
 void kprint(char* str)
 {
-	if (str == NULL)
-	{
-		return;
-	}
-	
+    if (str == NULL)
+    {
+        return;
+    }
+    
     char c;
     
     while ((c = *str++) != 0)
@@ -157,122 +157,122 @@ void kprint(char* str)
 
 void kprintf(const char *fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	char buffer[PRINTF_BUFFER_MAX] = {0};
-	vkprintf(fmt, buffer, PRINTF_BUFFER_MAX, args);
-	va_end(args);
-	kprint(buffer);
+    va_list args;
+    va_start(args, fmt);
+    char buffer[PRINTF_BUFFER_MAX] = {0};
+    vkprintf(fmt, buffer, PRINTF_BUFFER_MAX, args);
+    va_end(args);
+    kprint(buffer);
 }
 
 void ksprintf(const char *fmt, char* buffer, int len, ...)
 {
-	va_list args;
-	va_start(args, len);
-	vkprintf(fmt, buffer, len, args);
-	va_end(args);
+    va_list args;
+    va_start(args, len);
+    vkprintf(fmt, buffer, len, args);
+    va_end(args);
 }
 
 static void vkprintf(const char *fmt, char* buffer, int len, va_list args)
 {
-	char* pBuf = buffer;
-	char* pEndBuf = &buffer[len - 1];
+    char* pBuf = buffer;
+    char* pEndBuf = &buffer[len - 1];
 
-	while (*fmt != '\0')
-	{
-		// Search for control characters, else output character immediately.
-		if (*fmt == '%')
-		{
-			++fmt;
+    while (*fmt != '\0')
+    {
+        // Search for control characters, else output character immediately.
+        if (*fmt == '%')
+        {
+            ++fmt;
 
-			if (*fmt == '\0')
-			{
-				continue;
-			}
-			else if (*fmt == 'd' || *fmt == 'i')
-			{
-				long c = va_arg(args, int);
-				pBuf = itoa(pBuf, pEndBuf, c, 10);
-			}
-			else if (*fmt == 'u')
-			{
-				unsigned int c = va_arg(args, unsigned int);
-				pBuf = itoa_unsigned(pBuf, pEndBuf, c, 10);
-			}
-			else if (*fmt == 'x')
-			{
-				int c = va_arg(args, int);
-				pBuf = itoa(pBuf, pEndBuf, c, 16);
-			}
-			else if (*fmt == 'b')
-			{
-				int c = va_arg(args, int);
-				pBuf = itoa(pBuf, pEndBuf, c, 2);
-			}
-			else if (*fmt == 'l')
-			{
-				++fmt;
+            if (*fmt == '\0')
+            {
+                continue;
+            }
+            else if (*fmt == 'd' || *fmt == 'i')
+            {
+                long c = va_arg(args, int);
+                pBuf = itoa(pBuf, pEndBuf, c, 10);
+            }
+            else if (*fmt == 'u')
+            {
+                unsigned int c = va_arg(args, unsigned int);
+                pBuf = itoa_unsigned(pBuf, pEndBuf, c, 10);
+            }
+            else if (*fmt == 'x')
+            {
+                int c = va_arg(args, int);
+                pBuf = itoa(pBuf, pEndBuf, c, 16);
+            }
+            else if (*fmt == 'b')
+            {
+                int c = va_arg(args, int);
+                pBuf = itoa(pBuf, pEndBuf, c, 2);
+            }
+            else if (*fmt == 'l')
+            {
+                ++fmt;
 
-				if (*fmt == '\0')
-				{
-					continue;
-				}
-				else if (*fmt == 'l')
-				{
-					++fmt;
+                if (*fmt == '\0')
+                {
+                    continue;
+                }
+                else if (*fmt == 'l')
+                {
+                    ++fmt;
 
-					if (*fmt == '\0')
-					{
-						continue;
-					}
-					else if (*fmt == 'd')
-					{
-						long long c = va_arg(args, long long);
-						pBuf = lltoa(pBuf, pEndBuf, c, 10);
-					}
-					else if (*fmt == 'u')
-					{
-						unsigned long long c = va_arg(args, unsigned long long);
-						pBuf = lltoa_unsigned(pBuf, pEndBuf, c, 10);
-					}
-				}
-				else if (*fmt == 'd')
-				{
-					long c = va_arg(args, long);
-					pBuf = ltoa(pBuf, pEndBuf, c, 10);
-				}
-				else if (*fmt == 'u')
-				{
-					unsigned long c = va_arg(args, unsigned long);
-					pBuf = ltoa_unsigned(pBuf, pEndBuf, c, 10);
-				}
-			}
-			else if (*fmt == 's')
-			{
-				const char* s = va_arg(args, char*);
-				pBuf = safe_copy_str(pBuf, s, pEndBuf);
-			}
-			else if (*fmt == '%')
-			{
-				pBuf = safe_copy_char(pBuf, '%', pEndBuf);
-			}
-		}
-		else
-		{
-			pBuf = safe_copy_char(pBuf, *fmt, pEndBuf);
-		}
+                    if (*fmt == '\0')
+                    {
+                        continue;
+                    }
+                    else if (*fmt == 'd')
+                    {
+                        long long c = va_arg(args, long long);
+                        pBuf = lltoa(pBuf, pEndBuf, c, 10);
+                    }
+                    else if (*fmt == 'u')
+                    {
+                        unsigned long long c = va_arg(args, unsigned long long);
+                        pBuf = lltoa_unsigned(pBuf, pEndBuf, c, 10);
+                    }
+                }
+                else if (*fmt == 'd')
+                {
+                    long c = va_arg(args, long);
+                    pBuf = ltoa(pBuf, pEndBuf, c, 10);
+                }
+                else if (*fmt == 'u')
+                {
+                    unsigned long c = va_arg(args, unsigned long);
+                    pBuf = ltoa_unsigned(pBuf, pEndBuf, c, 10);
+                }
+            }
+            else if (*fmt == 's')
+            {
+                const char* s = va_arg(args, char*);
+                pBuf = safe_copy_str(pBuf, s, pEndBuf);
+            }
+            else if (*fmt == '%')
+            {
+                pBuf = safe_copy_char(pBuf, '%', pEndBuf);
+            }
+        }
+        else
+        {
+            pBuf = safe_copy_char(pBuf, *fmt, pEndBuf);
+        }
 
-		++fmt;
-	}
+        ++fmt;
+    }
 
-	int bufLen = pBuf - buffer;
+    int bufLen = pBuf - buffer;
 
-	if (bufLen == len)
-	{
-		buffer[len - 1] = '\0';
-	}
-	else
-	{
-		buffer[bufLen] = '\0';
-	}
+    if (bufLen == len)
+    {
+        buffer[len - 1] = '\0';
+    }
+    else
+    {
+        buffer[bufLen] = '\0';
+    }
 }

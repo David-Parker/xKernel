@@ -31,10 +31,10 @@ screen_ptr_t get_screen_addr(int row, int col)
 int get_cursor_pos()
 {
     unsigned char query_high_byte = 14;
-	unsigned char query_low_byte = 15;
+    unsigned char query_low_byte = 15;
 
-	// Query cursor position (offset from VGA memory start)
-	write_port_byte(PORT_VGA_REG_CTRL, query_high_byte);
+    // Query cursor position (offset from VGA memory start)
+    write_port_byte(PORT_VGA_REG_CTRL, query_high_byte);
     int cursor_index = read_port_byte(PORT_VGA_REG_DATA);
     cursor_index <<= 8;
     write_port_byte(PORT_VGA_REG_CTRL, query_low_byte);
@@ -46,7 +46,7 @@ int get_cursor_pos()
 void set_cursor_pos(int index)
 {
     unsigned char query_low_byte = 14;
-	unsigned char query_high_byte = 15;
+    unsigned char query_high_byte = 15;
 
     write_port_byte(PORT_VGA_REG_CTRL, query_low_byte);
     write_port_byte(PORT_VGA_REG_DATA, (unsigned char)(index >> 8));
@@ -100,7 +100,7 @@ void console_clear()
 
 void console_clear_line(int row)
 {
-    
+
 }
 
 void console_putc(char c)
