@@ -3,6 +3,7 @@
 #include <kernel/util/debug.h>
 #include <kernel/util/util.h>
 #include <kernel/lib/iolib.h>
+#include <kernel/hw/console.h>
 
 #pragma region strcmp
 
@@ -379,4 +380,34 @@ void test_init()
     TEST_FUNC(kprintf_hex);
     TEST_FUNC(kprintf_hex_max);
     TEST_FUNC(kprintf_mixed);
+}
+
+void test_driver()
+{
+        test_init();
+
+        int passed = 0;
+
+        for (int i = 0; i < test_no; ++i)
+        {
+            if (unit_tests[i].func() == true)
+            {
+                passed++;
+                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_GREEN);
+                kprintf("PASSED ");
+                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
+                kprintf("%s()\n", unit_tests[i].str);
+            }
+            else
+            {
+                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_RED);
+                kprintf("FAILED ");
+                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
+                kprintf("%s()\n", unit_tests[i].str);
+            }
+        }
+
+        kprintf("%d out of %d tests passed.\n", passed, test_no);
+
+        halt();
 }

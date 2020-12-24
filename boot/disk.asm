@@ -1,3 +1,4 @@
+[BITS 16]
 load_disk:
     ; setup stack frame
     push bp

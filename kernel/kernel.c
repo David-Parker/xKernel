@@ -21,32 +21,7 @@ void main() {
     console_init();
 
     #ifdef UNIT_TEST
-        test_init();
-
-        int passed = 0;
-
-        for (int i = 0; i < test_no; ++i)
-        {
-            if (unit_tests[i].func() == true)
-            {
-                passed++;
-                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_GREEN);
-                kprintf("PASSED ");
-                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
-                kprintf("%s()\n", unit_tests[i].str);
-            }
-            else
-            {
-                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_RED);
-                kprintf("FAILED ");
-                console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
-                kprintf("%s()\n", unit_tests[i].str);
-            }
-        }
-
-        kprintf("%d out of %d tests passed.\n", passed, test_no);
-
-        halt();
+        test_driver();
     #else
         intr_register_handler(0, div_by_zero);
 

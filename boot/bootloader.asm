@@ -25,7 +25,7 @@ SECTION .text
 
     ; [es:bx] = address for loaded disk sector
     mov bx, KERNEL_OFFSET
-    push 54 ; Most sectors before error
+    push 54 ; Most sectors before error (we are loading from 16 bit mode)
     call load_disk
     sub sp, 2
 

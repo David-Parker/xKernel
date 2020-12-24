@@ -31,3 +31,4 @@ do { \
 while (0);
 
 void test_init();
+void test_driver();
