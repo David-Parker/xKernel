@@ -14,8 +14,13 @@ typedef struct registers
    _u32 eip, cs, eflags, esp, ss; // Pushed by the processor automatically.
 } registers_t;
 
+// Interrupt handler callback
+typedef void (*isr_t)(registers_t*);
+isr_t intr_handlers[256];
+
 void isr_handler(registers_t* irq);
 void isr_handle_exception(registers_t* irq);
+void intr_register_handler(int intr_no, isr_t intr_handler);
 _u32 intr_get_flags();
 _u32 intr_disable();
 _u32 intr_enable();

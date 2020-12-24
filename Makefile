@@ -51,6 +51,14 @@ kernel.elf: boot/kernel_entry.o ${OBJ}
 run: os-image.bin
 	qemu-system-i386 -fda ${BINDIR}/os-image.bin
 
+build-test:
+	$(eval override CFLAGS += -D=UNIT_TEST)
+
+test: build-test os-image.bin
+	qemu-system-i386 -fda ${BINDIR}/os-image.bin
+
+test-debug: build-test debug
+
 # Open the connection to qemu and load our kernel-object file with symbols
 debug: os-image.bin
 	qemu-system-i386 -s -S -fda ${BINDIR}/os-image.bin &

@@ -78,6 +78,8 @@ void scroll_screen()
 
 void console_init()
 {
+    vga_console_color = VGA_COLOR_BLACK;
+    vga_font_color = VGA_COLOR_WHITE;
     vga_row_curr = 0;
     vga_col_curr = 0;
     set_cursor_pos(0);
@@ -118,7 +120,7 @@ void console_putc(char c)
         video_memory = get_screen_addr(vga_row_curr, vga_col_curr);
 
         *(video_memory) = c;
-        *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(VGA_COLOR_BLACK, VGA_COLOR_GREEN);
+        *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
 
         vga_col_curr++;
         vga_clamp();
@@ -126,4 +128,10 @@ void console_putc(char c)
 
     int idx = get_cursor_index(vga_row_curr, vga_col_curr);
     set_cursor_pos(idx);
+}
+
+void console_set_colors(_u8 console, _u8 font)
+{
+    vga_console_color = console;
+    vga_font_color = font;
 }

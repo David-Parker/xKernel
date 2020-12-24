@@ -165,18 +165,18 @@ void kprintf(const char *fmt, ...)
     kprint(buffer);
 }
 
-void ksprintf(const char *fmt, char* buffer, int len, ...)
+void ksprintf(const char *fmt, char* buffer, int buf_len, ...)
 {
     va_list args;
-    va_start(args, len);
-    vkprintf(fmt, buffer, len, args);
+    va_start(args, buf_len);
+    vkprintf(fmt, buffer, buf_len, args);
     va_end(args);
 }
 
-static void vkprintf(const char *fmt, char* buffer, int len, va_list args)
+void vkprintf(const char *fmt, char* buffer, int buf_len, va_list args)
 {
     char* pBuf = buffer;
-    char* pEndBuf = &buffer[len - 1];
+    char* pEndBuf = &buffer[buf_len - 1];
 
     while (*fmt != '\0')
     {
@@ -265,14 +265,14 @@ static void vkprintf(const char *fmt, char* buffer, int len, va_list args)
         ++fmt;
     }
 
-    int bufLen = pBuf - buffer;
+    int strLen = pBuf - buffer;
 
-    if (bufLen == len)
+    if (strLen == buf_len)
     {
-        buffer[len - 1] = '\0';
+        buffer[buf_len - 1] = '\0';
     }
     else
     {
-        buffer[bufLen] = '\0';
+        buffer[strLen] = '\0';
     }
 }

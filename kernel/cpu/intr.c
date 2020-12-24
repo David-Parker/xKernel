@@ -40,11 +40,21 @@ const char* intr_strings[] =
     "Reserved"
 };
 
+isr_t intr_handlers[256] = { NULL };
+
 // Interrupt Handler
 void isr_handler(registers_t* intr)
 {
     kassert(intr->cs == GDT_ADDR_SEG_KERNEL_CODE || intr->cs == GDT_ADDR_SEG_USER_CODE);
 
+    if (intr_handlers[intr->int_no] != NULL)
+    {
+        isr_t handler = intr_handlers[intr->int_no];
+        handler(intr);
+        return;
+    }
+
+    // Default handler
     switch (intr->int_no)
     {
         case IDT_INTR_DIV_ZERO:
@@ -78,6 +88,13 @@ void isr_handle_exception(registers_t* intr)
     {
        // deliver signal to user process
     }
+}
+
+void intr_register_handler(int intr_no, isr_t intr_handler)
+{
+    kassert(intr_no >= 0 && intr_no <= 255);
+
+    intr_handlers[intr_no] = intr_handler;
 }
 
 _u32 intr_get_flags()

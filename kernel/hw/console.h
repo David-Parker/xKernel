@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kernel/util/stddef.h>
+
 // Writes to a character frame buffer while booted in text mode
 // More on text mode: https://en.wikipedia.org/wiki/Text_mode
 
@@ -29,6 +31,8 @@
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
 typedef char* screen_ptr_t;
+static _u8 vga_console_color;
+static _u8 vga_font_color;
 int vga_row_curr;
 int vga_col_curr;
 
@@ -36,3 +40,4 @@ void console_init();
 void console_clear();
 void console_clear_line(int row);
 void console_putc(char c);
+void console_set_colors(_u8 console, _u8 font);

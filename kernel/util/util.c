@@ -14,6 +14,31 @@ void mem_set(_u8 *dest, _u8 val, _u32 len) {
     for ( ; len != 0; len--) *temp++ = val;
 }
 
+bool strcmp(char* lhs, char* rhs)
+{
+    if (lhs == NULL || rhs == NULL)
+    {
+        return lhs == rhs;
+    }
+
+    while (*lhs != '\0')
+    {
+        char c = *lhs++;
+        char o = *rhs++;
+
+        if (o == '\0')
+        {
+            return false;
+        }
+        if (c != o)
+        {
+            return false;
+        }
+    }
+
+    return *rhs == '\0';
+}
+
 void halt()
 {
     __asm__("hlt");

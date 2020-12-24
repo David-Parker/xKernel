@@ -15,5 +15,5 @@ char* lltoa(char* destination, char* end, long long c, int base);
 char* lltoa_unsigned(char* destination, char* end, unsigned long long c, int base);
 void kprint(char* str);
 void kprintf(const char *fmt, ...);
-void ksprintf(const char *fmt, char* buffer, int len, ...);
-static void vkprintf(const char *fmt, char* buffer, int len, va_list args);
+void ksprintf(const char *fmt, char* buffer, int buf_len, ...);
+void vkprintf(const char *fmt, char* buffer, int buf_len, va_list args);
