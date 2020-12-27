@@ -9,7 +9,7 @@ load_disk:
 
     mov ah, 0x02 ; read
     mov al, [bp + 4]
-    mov cl, 0x02 ; 0x02 is next sector after boot sector
+    mov cl, 0x03 ; 0x03 is next sector after mbr and loader
     mov ch, 0x00 ; cylinder 0
     mov dh, 0x00 ; head 0
 

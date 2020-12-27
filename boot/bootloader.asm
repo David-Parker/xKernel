@@ -1,31 +1,17 @@
 ; Custom boot loader
 ; For more information on how to create a bootable .iso for this boot loader visit
 ; https://stackoverflow.com/questions/34268518/creating-a-bootable-iso-image-with-custom-bootloader
-[org 0x7c00]
-KERNEL_OFFSET equ 0x1000
+KERNEL_OFFSET equ 0x1200
 
+[org 0x1000]
 SECTION .text
-
-    mov [BOOT_DRIVE], dl
-    cli
-    mov ax,0
-    mov ds,ax
-    mov es,ax
-    mov bx, 0x8000
-
-    mov ss,bx   ; Stack segment
-    mov sp,ax   ; Stack 0x80000 (top) - 0x8FFFF (bottom)
-    sti
-
-    cld         ; Set the direction flag to be positive direction
-
     push MSG_START
     call print_16
     sub sp, 2 ; arg pop (msg)
 
     ; [es:bx] = address for loaded disk sector
     mov bx, KERNEL_OFFSET
-    push 54 ; Most sectors before error (we are loading from 16 bit mode)
+    push 110 ; Most sectors before error (we are loading from 16 bit mode)
     call load_disk
     sub sp, 2
 
@@ -51,6 +37,5 @@ Prot_Main:
     call KERNEL_OFFSET
     jmp $
 
-; padding and magic number
-times 510 - ($-$$) db 0
-dw 0xaa55
+; padding
+times 512 - ($-$$) db 0

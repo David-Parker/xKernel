@@ -18,12 +18,12 @@ $(shell rm -rf $(DIRS))
 $(shell mkdir -p $(DIRS))
 
 # First rule is run by default
-os-image.bin: boot/bootloader.bin kernel.bin kernel.elf
+os-image.bin: boot/mbr.bin boot/bootloader.bin kernel.bin kernel.elf
 	find . -type f -name "*.o" -exec mv -i {} ${BINDIR} \;
 	find . -type f -name "*.bin" -exec mv -i {} ${BINDIR} \;
 	find . -type f -name "*.img" -exec mv -i {} ${BINDIR} \;
-	cat ${BINDIR}/bootloader.bin ${BINDIR}/kernel.bin > ${BINDIR}/os-image.bin
-	truncate -s 32K ${BINDIR}/os-image.bin
+	cat ${BINDIR}/mbr.bin ${BINDIR}/bootloader.bin ${BINDIR}/kernel.bin > ${BINDIR}/os-image.bin
+	truncate -s 64K ${BINDIR}/os-image.bin
 
 packages:
 	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin bcc
@@ -42,11 +42,11 @@ iso: os-image.bin
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o ${OBJ}
-	${LD} -o ${BINDIR}/$@ -Ttext 0x1000 $^ --oformat binary -L/usr/local/i386elfgcc/lib/gcc/i386-elf/4.9.1 -lgcc
+	${LD} -o ${BINDIR}/$@ -Ttext 0x1200 $^ --oformat binary -L/usr/local/i386elfgcc/lib/gcc/i386-elf/4.9.1 -lgcc
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${OBJ}
-	${LD} -o ${BINDIR}/$@ -Ttext 0x1000 $^ -L/usr/local/i386elfgcc/lib/gcc/i386-elf/4.9.1 -lgcc
+	${LD} -o ${BINDIR}/$@ -Ttext 0x1200 $^ -L/usr/local/i386elfgcc/lib/gcc/i386-elf/4.9.1 -lgcc
 
 run: os-image.bin
 	qemu-system-i386 -drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
