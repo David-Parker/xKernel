@@ -6,7 +6,10 @@
 #include <kernel/cpu/intr.h>
 #include <kernel/cpu/gdt.h>
 #include <kernel/cpu/idt.h>
+
+#ifdef UNIT_TEST
 #include <kernel/test/unit_test.h>
+#endif
 
 void div_by_zero(registers_t* regs)
 {

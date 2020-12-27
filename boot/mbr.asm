@@ -7,18 +7,6 @@ LOADER_OFFSET equ 0x1000
 
 [org 0x7c00]
 SECTION .text
-    mov [BOOT_DRIVE], dl
-    cli
-    mov ax,0
-    mov ds,ax
-    mov es,ax
-    mov ss,ax
-
-    mov sp,0xf000   ; Stack 0xf000 - grows downward. Will be same stack when kernel loaded.
-    sti
-
-    cld         ; Set the direction flag to be positive direction
-
     ; Load the real boot loader
     mov bx, LOADER_OFFSET
     mov ah, 0x02 ; read

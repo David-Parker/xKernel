@@ -1,8 +1,10 @@
+#ifdef UNIT_TEST 
 #include <kernel/test/unit_test.h>
 #include <kernel/util/stddef.h>
 #include <kernel/util/debug.h>
 #include <kernel/util/util.h>
 #include <kernel/lib/iolib.h>
+#include <kernel/lib/ds.h>
 #include <kernel/hw/console.h>
 
 #pragma region strcmp
@@ -332,6 +334,134 @@ bool kprintf_mixed()
 }
 #pragma GCC diagnostic pop
 #pragma endregion iolib
+#pragma region linked_list
+bool linkedlist_empty()
+{
+    linked_list_t list;
+	linked_list_init(&list);
+
+	tassert(list.head == NULL);
+    tassert(list.count == 0);
+
+    return true;
+}
+
+bool linkedlist_add_one()
+{
+	struct list_int
+	{
+		linked_list_node_t elem;
+		int x;
+	};
+
+	struct list_int e;
+	e.x = 42;
+
+    linked_list_t list;
+	linked_list_init(&list);
+
+	linked_list_add_back(&list, &e.elem);
+
+	tassert(list.head != NULL);
+    tassert(list.count == 1);
+	tassert(list_entry(list.head, struct list_int, elem)->x == 42);
+
+    return true;
+}
+
+bool linkedlist_add_multi()
+{
+	struct list_int
+	{
+		linked_list_node_t elem;
+		int x;
+	};
+
+	struct list_int e1,e2,e3;
+
+	e1.x = 1;
+	e2.x = 2;
+	e3.x = 3;
+
+    linked_list_t list;
+	linked_list_init(&list);
+
+	linked_list_add_back(&list, &e1.elem);
+	linked_list_add_back(&list, &e2.elem);
+	linked_list_add_back(&list, &e3.elem);
+
+	tassert(list.head != NULL);
+    tassert(list.count == 3);
+
+	linked_list_node_ptr_t p = list.head;
+
+	int x = 1;
+	while (p != list.head->prev)
+	{
+		tassert(list_entry(p, struct list_int, elem)->x == x++);
+		p = p->next;
+	}
+
+    return true;
+}
+
+bool linkedlist_remove_one()
+{
+	struct list_int
+	{
+		linked_list_node_t elem;
+		int x;
+	};
+
+	struct list_int e;
+	e.x = 42;
+
+    linked_list_t list;
+	linked_list_init(&list);
+
+	linked_list_add_back(&list, &e.elem);
+	linked_list_remove(&list, &e.elem);
+
+	tassert(list.head == NULL);
+    tassert(list.count == 0);
+
+    return true;
+}
+
+bool linkedlist_remove_multi()
+{
+	struct list_int
+	{
+		linked_list_node_t elem;
+		int x;
+	};
+
+	struct list_int e1,e2,e3;
+
+	e1.x = 1;
+	e2.x = 2;
+	e3.x = 3;
+
+    linked_list_t list;
+	linked_list_init(&list);
+
+	linked_list_add_back(&list, &e1.elem);
+	linked_list_add_back(&list, &e2.elem);
+	linked_list_add_back(&list, &e3.elem);
+
+	linked_list_remove(&list, &e2.elem);
+
+	tassert(list.head != NULL);
+    tassert(list.count == 2);
+
+	linked_list_node_ptr_t p = list.head;
+
+	tassert(list_entry(p, struct list_int, elem)->x == 1);
+	tassert(list_entry(p->next, struct list_int, elem)->x == 3);
+
+    return true;
+}
+#pragma end region
 
 void test_init()
 {
@@ -380,6 +510,11 @@ void test_init()
     TEST_FUNC(kprintf_hex);
     TEST_FUNC(kprintf_hex_max);
     TEST_FUNC(kprintf_mixed);
+	TEST_FUNC(linkedlist_empty);
+	TEST_FUNC(linkedlist_add_one);
+	TEST_FUNC(linkedlist_add_multi);
+	TEST_FUNC(linkedlist_remove_one);
+	TEST_FUNC(linkedlist_remove_multi);
 }
 
 void test_driver()
@@ -411,3 +546,4 @@ void test_driver()
 
         halt();
 }
+#endif
