@@ -16,17 +16,32 @@
 typedef struct linked_list_node {
     struct linked_list_node* next;
     struct linked_list_node* prev;
-} linked_list_node_t, *linked_list_node_ptr_t;
+} linked_list_node_t;
 
 typedef struct linked_list
 {
     int count;
-    linked_list_node_ptr_t head; // tail is always head->prev
-} linked_list_t, *linked_list_ptr_t;
+    linked_list_node_t* head; // tail is always head->prev
+} linked_list_t;
 
-void linked_list_init(linked_list_ptr_t list);
-void linked_list_add_back(linked_list_ptr_t list, linked_list_node_ptr_t toAdd);
-void linked_list_add_front(linked_list_ptr_t list, linked_list_node_ptr_t toAdd);
-void linked_list_remove(linked_list_ptr_t list, linked_list_node_ptr_t toRemove);
-static void linked_list_add_before(linked_list_node_ptr_t node, linked_list_node_ptr_t toAdd);
-static void linked_list_add_empty(linked_list_ptr_t list, linked_list_node_ptr_t toAdd);
+void linked_list_init(linked_list_t* list);
+void linked_list_add_back(linked_list_t* list, linked_list_node_t* toAdd);
+void linked_list_add_front(linked_list_t* list, linked_list_node_t* toAdd);
+void linked_list_remove(linked_list_t* list, linked_list_node_t* toRemove);
+static void linked_list_add_before(linked_list_node_t* node, linked_list_node_t* toAdd);
+static void linked_list_add_empty(linked_list_t* list, linked_list_node_t* toAdd);
+
+typedef struct ring_buffer
+{
+    size_t* buffer;
+    int buf_len;
+    int ring_len;
+    int idx_start;
+    int idx_end;
+    int cnt;
+} ring_buffer_t, *ring_buffer_ptr_t;
+
+void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring_len);
+void ring_buffer_push(ring_buffer_t* ring, size_t elem);
+size_t ring_buffer_get(ring_buffer_t* ring, int idx);
+int ring_buffer_next(ring_buffer_t* ring, int read_idx);

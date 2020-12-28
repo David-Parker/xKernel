@@ -1,6 +1,9 @@
 #pragma once
 
 #include <kernel/util/stddef.h>
+#include <kernel/util/util.h>
+#include <kernel/cpu/intr.h>
+#include <kernel/lib/iolib.h>
 
 #define kassert(cond) \
 do { \

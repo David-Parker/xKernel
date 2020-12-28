@@ -39,7 +39,32 @@ bool strcmp(char* lhs, char* rhs)
     return *rhs == '\0';
 }
 
+int strlen(char* str)
+{
+    int len = 0;
+
+    while (*str != '\0')
+    {
+        len++;
+        str++;
+    }
+
+    return len;
+}
+
 void halt()
 {
     __asm__("hlt");
+}
+
+int min(int lhs, int rhs)
+{
+    if (lhs <= rhs) return lhs;
+    else return rhs;
+}
+
+int max(int lhs, int rhs)
+{
+    if (lhs >= rhs) return lhs;
+    else return rhs;
 }

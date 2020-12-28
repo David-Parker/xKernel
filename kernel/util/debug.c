@@ -1,7 +1,4 @@
 #include <kernel/util/debug.h>
-#include <kernel/util/util.h>
-#include <kernel/cpu/intr.h>
-#include <kernel/lib/iolib.h>
 
 void kpanic(char* message)
 {

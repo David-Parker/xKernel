@@ -6,6 +6,7 @@
 #include <kernel/lib/iolib.h>
 #include <kernel/lib/ds.h>
 #include <kernel/hw/console.h>
+#include <kernel/mem/malloc.h>
 
 #pragma region strcmp
 
@@ -24,6 +25,7 @@ bool strcmp_one_null()
     char* lhs = "hey";
     char* rhs = NULL;
 
+    tassert(strlen(lhs) == 3);
     tassert(strcmp(lhs, rhs) == false);
 
     return true;
@@ -34,6 +36,7 @@ bool strcmp_same()
     char* lhs = "hey";
     char* rhs = "hey";
 
+    tassert(strlen(lhs) == 3);
     tassert(strcmp(lhs, rhs) == true);
 
     return true;
@@ -87,250 +90,250 @@ bool kprintf_int()
 }
 bool kprintf_int_zero()
 {
-	char expected[] = "0";
-	TestString(expected, "%d", 0);
-	TestString(expected, "%i", 0);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%d", 0);
+    TestString(expected, "%i", 0);
+    return true;
 }
 bool kprintf_int_positive_small()
 {
-	char expected[] = "1";
-	TestString(expected, "%d", 1);
-	TestString(expected, "%i", 1);
-	return true;
+    char expected[] = "1";
+    TestString(expected, "%d", 1);
+    TestString(expected, "%i", 1);
+    return true;
 }
 bool kprintf_int_positive_max()
 {
-	char expected[] = "2147483647";
-	TestString(expected, "%d", INT32_MAX);
-	TestString(expected, "%i", INT32_MAX);
-	return true;
+    char expected[] = "2147483647";
+    TestString(expected, "%d", INT32_MAX);
+    TestString(expected, "%i", INT32_MAX);
+    return true;
 }
 bool kprintf_int_positive_max_plusone()
 {
-	char expected[] = "-2147483648";
-	TestString(expected, "%d", INT32_MAX + 1);
-	TestString(expected, "%i", INT32_MAX + 1);
-	return true;
+    char expected[] = "-2147483648";
+    TestString(expected, "%d", INT32_MAX + 1);
+    TestString(expected, "%i", INT32_MAX + 1);
+    return true;
 }
 bool kprintf_int_negative_small()
 {
-	char expected[] = "-1";
-	TestString(expected, "%d", -1);
-	TestString(expected, "%i", -1);
-	return true;
+    char expected[] = "-1";
+    TestString(expected, "%d", -1);
+    TestString(expected, "%i", -1);
+    return true;
 }
 bool kprintf_int_negative_max()
 {
-	char expected[] = "-2147483648";
-	TestString(expected, "%d", INT32_MIN);
-	TestString(expected, "%i", INT32_MIN);
-	return true;
+    char expected[] = "-2147483648";
+    TestString(expected, "%d", INT32_MIN);
+    TestString(expected, "%i", INT32_MIN);
+    return true;
 }
 bool kprintf_int_negative_max_plusone()
 {
-	char expected[] = "2147483647";
-	TestString(expected, "%d", INT32_MIN - 1);
-	TestString(expected, "%i", INT32_MIN - 1);
-	return true;
+    char expected[] = "2147483647";
+    TestString(expected, "%d", INT32_MIN - 1);
+    TestString(expected, "%i", INT32_MIN - 1);
+    return true;
 }
 bool kprintf_unsigned_int_zero()
 {
-	char expected[] = "0";
-	TestString(expected, "%u", 0);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%u", 0);
+    return true;
 }
 bool kprintf_unsigned_int_small()
 {
-	char expected[] = "1";
-	TestString(expected, "%u", 1);
-	return true;
+    char expected[] = "1";
+    TestString(expected, "%u", 1);
+    return true;
 }
 bool kprintf_unsigned_int_max()
 {
-	char expected[] = "4294967295";
-	TestString(expected, "%u", UINT32_MAX);
-	return true;
+    char expected[] = "4294967295";
+    TestString(expected, "%u", UINT32_MAX);
+    return true;
 }
 bool kprintf_unsigned_int_max_plusone()
 {
-	char expected[] = "0";
-	TestString(expected, "%u", UINT32_MAX + 1);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%u", UINT32_MAX + 1);
+    return true;
 }
 bool kprintf_long_zero()
 {
-	char expected[] = "0";
-	TestString(expected, "%ld", 0l);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%ld", 0l);
+    return true;
 }
 bool kprintf_long_positive_small()
 {
-	char expected[] = "1";
-	TestString(expected, "%ld", 1l);
-	return true;
+    char expected[] = "1";
+    TestString(expected, "%ld", 1l);
+    return true;
 }
 bool kprintf_long_positive_max()
 {
-	char buffer[64];
-	char* expected = "-1";
-	TestString(expected, "%ld", INT64_MAX);
-	return true;
+    char buffer[64];
+    char* expected = "-1";
+    TestString(expected, "%ld", INT64_MAX);
+    return true;
 }
 bool kprintf_long_positive_max_plusone()
 {
-	char buffer[64];
-	char* expected = "0";
-	TestString(expected, "%ld", INT64_MAX + 1);
-	return true;
+    char buffer[64];
+    char* expected = "0";
+    TestString(expected, "%ld", INT64_MAX + 1);
+    return true;
 }
 bool kprintf_long_negative_small()
 {
-	char expected[] = "-1";
-	TestString(expected, "%ld", -1l);
-	return true;
+    char expected[] = "-1";
+    TestString(expected, "%ld", -1l);
+    return true;
 }
 bool kprintf_long_negative_max()
 {
-	char buffer[64];
-	char* expected = "0";
-	TestString(expected, "%ld", INT64_MIN);
-	return true;
+    char buffer[64];
+    char* expected = "0";
+    TestString(expected, "%ld", INT64_MIN);
+    return true;
 }
 bool kprintf_long_negative_max_plusone()
 {
-	char buffer[64];
-	char* expected = "-1";
-	TestString(expected, "%ld", INT64_MIN - 1);
-	return true;
+    char buffer[64];
+    char* expected = "-1";
+    TestString(expected, "%ld", INT64_MIN - 1);
+    return true;
 }
 bool kprintf_unsigned_long_zero()
 {
-	char expected[] = "0";
-	TestString(expected, "%lu", 0ul);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%lu", 0ul);
+    return true;
 }
 bool kprintf_unsigned_long_small()
 {
-	char expected[] = "1";
-	TestString(expected, "%lu", 1ul);
-	return true;
+    char expected[] = "1";
+    TestString(expected, "%lu", 1ul);
+    return true;
 }
 bool kprintf_unsigned_long_max()
 {
-	char buffer[64];
-	char* expected = "18446744073709551615";
-	TestString(expected, "%llu", UINT64_MAX);
-	return true;
+    char buffer[64];
+    char* expected = "18446744073709551615";
+    TestString(expected, "%llu", UINT64_MAX);
+    return true;
 }
 bool kprintf_unsigned_longmax_plusone()
 {
-	char buffer[64];
-	char* expected = "0";
-	TestString(expected, "%lu", UINT64_MAX + 1);
-	return true;
+    char buffer[64];
+    char* expected = "0";
+    TestString(expected, "%lu", UINT64_MAX + 1);
+    return true;
 }
 bool kprintf_longlong_zero()
 {
-	char expected[] = "0";
-	TestString(expected, "%lld", 0ll);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%lld", 0ll);
+    return true;
 }
 bool kprintf_longlong_positive_small()
 {
-	char expected[] = "1";
-	TestString(expected, "%lld", 1ll);
-	return true;
+    char expected[] = "1";
+    TestString(expected, "%lld", 1ll);
+    return true;
 }
 bool kprintf_longlong_positive_max()
 {
-	char expected[] = "9223372036854775807";
-	TestString(expected, "%lld", INT64_MAX);
-	return true;
+    char expected[] = "9223372036854775807";
+    TestString(expected, "%lld", INT64_MAX);
+    return true;
 }
 bool kprintf_longlong_positive_max_plusone()
 {
-	char expected[] = "-9223372036854775808";
-	TestString(expected, "%lld", INT64_MAX + 1);
-	return true;
+    char expected[] = "-9223372036854775808";
+    TestString(expected, "%lld", INT64_MAX + 1);
+    return true;
 }
 bool kprintf_longlong_negative_small()
 {
-	char expected[] = "-1";
-	TestString(expected, "%lld", -1ll);
-	return true;
+    char expected[] = "-1";
+    TestString(expected, "%lld", -1ll);
+    return true;
 }
 bool kprintf_longlong_negative_max()
 {
-	char expected[] = "-9223372036854775808";
-	TestString(expected, "%lld", INT64_MIN);
-	return true;
+    char expected[] = "-9223372036854775808";
+    TestString(expected, "%lld", INT64_MIN);
+    return true;
 }
 bool kprintf_longlong_negative_max_plusone()
 {
-	char expected[] = "9223372036854775807";
-	TestString(expected, "%lld", INT64_MIN - 1);
-	return true;
+    char expected[] = "9223372036854775807";
+    TestString(expected, "%lld", INT64_MIN - 1);
+    return true;
 }
 bool kprintf_unsigned_longlong_zero()
 {
-	char expected[] = "0";
-	TestString(expected, "%llu", 0ull);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%llu", 0ull);
+    return true;
 }
 bool kprintf_unsigned_longlong_small()
 {
-	char expected[] = "1";
-	TestString(expected, "%llu", 1ull);
-	return true;
+    char expected[] = "1";
+    TestString(expected, "%llu", 1ull);
+    return true;
 }
 bool kprintf_unsigned_longlong_max()
 {
-	char expected[] = "18446744073709551615";
-	TestString(expected, "%llu", UINT64_MAX);
-	return true;
+    char expected[] = "18446744073709551615";
+    TestString(expected, "%llu", UINT64_MAX);
+    return true;
 }
 bool kprintf_unsigned_longlongmax_plusone()
 {
-	char expected[] = "0";
-	TestString(expected, "%llu", UINT64_MAX + 1);
-	return true;
+    char expected[] = "0";
+    TestString(expected, "%llu", UINT64_MAX + 1);
+    return true;
 }
 bool kprintf_string_empty()
 {
-	char expected[] = "";
-	TestString(expected, "");
-	return true;
+    char expected[] = "";
+    TestString(expected, "");
+    return true;
 }
 bool kprintf_string_small()
 {
-	char expected[] = "test";
-	TestString(expected, "%s", "test");
-	return true;
+    char expected[] = "test";
+    TestString(expected, "%s", "test");
+    return true;
 }
 bool kprintf_string_multi()
 {
-	char expected[] = "foo bar";
-	TestString(expected, "%s %s", "foo", "bar");
-	return true;
+    char expected[] = "foo bar";
+    TestString(expected, "%s %s", "foo", "bar");
+    return true;
 }
 bool kprintf_hex()
 {
-	char expected[] = "f";
-	TestString(expected, "%x", 15);
-	return true;
+    char expected[] = "f";
+    TestString(expected, "%x", 15);
+    return true;
 }
 bool kprintf_hex_max()
 {
-	char expected[] = "7fffffff";
-	TestString(expected, "%x", INT32_MAX);
-	return true;
+    char expected[] = "7fffffff";
+    TestString(expected, "%x", INT32_MAX);
+    return true;
 }
 bool kprintf_mixed()
 {
-	char expected[] = "% 123 is foo 10 12345 %";
-	TestString(expected, "%% %d is %s %x %llu %%", 123, "foo", 16, 12345ull);
-	return true;
+    char expected[] = "% 123 is foo 10 12345 %";
+    TestString(expected, "%% %d is %s %x %llu %%", 123, "foo", 16, 12345ull);
+    return true;
 }
 #pragma GCC diagnostic pop
 #pragma endregion iolib
@@ -338,9 +341,9 @@ bool kprintf_mixed()
 bool linkedlist_empty()
 {
     linked_list_t list;
-	linked_list_init(&list);
+    linked_list_init(&list);
 
-	tassert(list.head == NULL);
+    tassert(list.head == NULL);
     tassert(list.count == 0);
 
     return true;
@@ -348,81 +351,81 @@ bool linkedlist_empty()
 
 bool linkedlist_add_one()
 {
-	struct list_int
-	{
-		linked_list_node_t elem;
-		int x;
-	};
+    struct list_int
+    {
+        linked_list_node_t elem;
+        int x;
+    };
 
-	struct list_int e;
-	e.x = 42;
+    struct list_int e;
+    e.x = 42;
 
     linked_list_t list;
-	linked_list_init(&list);
+    linked_list_init(&list);
 
-	linked_list_add_back(&list, &e.elem);
+    linked_list_add_back(&list, &e.elem);
 
-	tassert(list.head != NULL);
+    tassert(list.head != NULL);
     tassert(list.count == 1);
-	tassert(list_entry(list.head, struct list_int, elem)->x == 42);
+    tassert(((list_entry(list.head, struct list_int, elem)))->x == 42);
 
     return true;
 }
 
 bool linkedlist_add_multi()
 {
-	struct list_int
-	{
-		linked_list_node_t elem;
-		int x;
-	};
+    struct list_int
+    {
+        linked_list_node_t elem;
+        int x;
+    };
 
-	struct list_int e1,e2,e3;
+    struct list_int e1,e2,e3;
 
-	e1.x = 1;
-	e2.x = 2;
-	e3.x = 3;
+    e1.x = 1;
+    e2.x = 2;
+    e3.x = 3;
 
     linked_list_t list;
-	linked_list_init(&list);
+    linked_list_init(&list);
 
-	linked_list_add_back(&list, &e1.elem);
-	linked_list_add_back(&list, &e2.elem);
-	linked_list_add_back(&list, &e3.elem);
+    linked_list_add_back(&list, &e1.elem);
+    linked_list_add_back(&list, &e2.elem);
+    linked_list_add_back(&list, &e3.elem);
 
-	tassert(list.head != NULL);
+    tassert(list.head != NULL);
     tassert(list.count == 3);
 
-	linked_list_node_ptr_t p = list.head;
+    linked_list_node_t* p = list.head;
 
-	int x = 1;
-	while (p != list.head->prev)
-	{
-		tassert(list_entry(p, struct list_int, elem)->x == x++);
-		p = p->next;
-	}
+    int x = 1;
+    while (p != list.head->prev)
+    {
+        tassert(list_entry(p, struct list_int, elem)->x == x++);
+        p = p->next;
+    }
 
     return true;
 }
 
 bool linkedlist_remove_one()
 {
-	struct list_int
-	{
-		linked_list_node_t elem;
-		int x;
-	};
+    struct list_int
+    {
+        linked_list_node_t elem;
+        int x;
+    };
 
-	struct list_int e;
-	e.x = 42;
+    struct list_int e;
+    e.x = 42;
 
     linked_list_t list;
-	linked_list_init(&list);
+    linked_list_init(&list);
 
-	linked_list_add_back(&list, &e.elem);
-	linked_list_remove(&list, &e.elem);
+    linked_list_add_back(&list, &e.elem);
+    linked_list_remove(&list, &e.elem);
 
-	tassert(list.head == NULL);
+    tassert(list.head == NULL);
     tassert(list.count == 0);
 
     return true;
@@ -430,38 +433,117 @@ bool linkedlist_remove_one()
 
 bool linkedlist_remove_multi()
 {
-	struct list_int
-	{
-		linked_list_node_t elem;
-		int x;
-	};
+    struct list_int
+    {
+        linked_list_node_t elem;
+        int x;
+    };
 
-	struct list_int e1,e2,e3;
+    struct list_int e1,e2,e3;
 
-	e1.x = 1;
-	e2.x = 2;
-	e3.x = 3;
+    e1.x = 1;
+    e2.x = 2;
+    e3.x = 3;
 
     linked_list_t list;
-	linked_list_init(&list);
+    linked_list_init(&list);
 
-	linked_list_add_back(&list, &e1.elem);
-	linked_list_add_back(&list, &e2.elem);
-	linked_list_add_back(&list, &e3.elem);
+    linked_list_add_back(&list, &e1.elem);
+    linked_list_add_back(&list, &e2.elem);
+    linked_list_add_back(&list, &e3.elem);
 
-	linked_list_remove(&list, &e2.elem);
+    linked_list_remove(&list, &e2.elem);
 
-	tassert(list.head != NULL);
+    tassert(list.head != NULL);
     tassert(list.count == 2);
 
-	linked_list_node_ptr_t p = list.head;
+    linked_list_node_t* p = list.head;
 
-	tassert(list_entry(p, struct list_int, elem)->x == 1);
-	tassert(list_entry(p->next, struct list_int, elem)->x == 3);
+    tassert(list_entry(p, struct list_int, elem)->x == 1);
+    tassert(list_entry(p->next, struct list_int, elem)->x == 3);
 
     return true;
 }
-#pragma end region
+#pragma endregion
+#pragma region ring_buffer
+bool ring_buffer_spin()
+{
+    size_t buffer[4];
+
+    ring_buffer_t ring;
+    ring_buffer_init(&ring, buffer, ARRSIZE(buffer), ARRSIZE(buffer));
+
+    for (int i = 0; i < 8; ++i)
+    {
+        ring_buffer_push(&ring, i % 4);
+    }
+
+    for (int i = 0; i < 8; ++i)
+    {
+        size_t elem = ring_buffer_get(&ring, i);
+        tassert(elem == i % 4);
+    }
+
+    return true;
+}
+
+bool ring_buffer_window()
+{
+    size_t buffer[8];
+
+    ring_buffer_t ring;
+    ring_buffer_init(&ring, buffer, ARRSIZE(buffer), ARRSIZE(buffer) / 2);
+
+    for (int i = 0; i < 8; ++i)
+    {
+        ring_buffer_push(&ring, i);
+    }
+
+    // [0,1,2,3,(4,5,6,7)]
+
+    int x = 4;
+    int i = ring.idx_start;
+
+    while (i != -1)
+    {
+        size_t elem = ring_buffer_get(&ring, i);
+        tassert(elem == x++);
+        i = ring_buffer_next(&ring, i);
+    }
+
+    return true;
+}
+
+bool ring_buffer_window_indirect()
+{
+    size_t buffer[8];
+
+    ring_buffer_t ring;
+    ring_buffer_init(&ring, buffer, ARRSIZE(buffer), ARRSIZE(buffer) / 2);
+
+    for (int i = 0; i < 8; ++i)
+    {
+        size_t* mem = (size_t*)kmalloc(4);
+        *mem = i;
+
+        ring_buffer_push(&ring, (size_t)mem);
+    }
+
+    // [0,1,2,3,(4,5,6,7)]
+
+    int x = 4;
+    int i = ring.idx_start;
+
+    while (i != -1)
+    {
+        size_t* elem = (size_t*)ring_buffer_get(&ring, i);
+        tassert(*elem == x++);
+        i = ring_buffer_next(&ring, i);
+    }
+
+    return true;
+}
+#pragma endregion
 
 void test_init()
 {
@@ -510,11 +592,14 @@ void test_init()
     TEST_FUNC(kprintf_hex);
     TEST_FUNC(kprintf_hex_max);
     TEST_FUNC(kprintf_mixed);
-	TEST_FUNC(linkedlist_empty);
-	TEST_FUNC(linkedlist_add_one);
-	TEST_FUNC(linkedlist_add_multi);
-	TEST_FUNC(linkedlist_remove_one);
-	TEST_FUNC(linkedlist_remove_multi);
+    TEST_FUNC(linkedlist_empty);
+    TEST_FUNC(linkedlist_add_one);
+    TEST_FUNC(linkedlist_add_multi);
+    TEST_FUNC(linkedlist_remove_one);
+    TEST_FUNC(linkedlist_remove_multi);
+    TEST_FUNC(ring_buffer_spin);
+    TEST_FUNC(ring_buffer_window);
+    TEST_FUNC(ring_buffer_window_indirect);
 }
 
 void test_driver()

@@ -6,5 +6,6 @@
 #define PHY_VGA_MEM_START 0xb8000 // This address is memory-mapped to VGA controller's video memory while in text mode
 #define PHY_VGA_MEM_END 0xb8fa0
 #define PHY_KERNEL_STACK_START 0x90000
+#define PHY_KERNEL_HEAP_START 0xf00000
 #define PHY_PAGE_MEM_START 0x100000
 #define PHY_MAX_MEM 0xffffffff
