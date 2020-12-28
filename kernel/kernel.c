@@ -11,12 +11,6 @@
 #include <kernel/test/unit_test.h>
 #endif
 
-void div_by_zero(registers_t* regs)
-{
-    kprintf("Divide by zero!\n");
-    regs->eip++;
-}
-
 // Kernel entry is jumped to from boot loader after enabling 32-bit prot execution. At this time virtual memory paging is not enabled.
 void main() {
     gdt_init();
@@ -25,17 +19,13 @@ void main() {
 
     #ifdef UNIT_TEST
         test_driver();
-    #else
-        intr_register_handler(0, div_by_zero);
-
-        // Divide by zero, this should call the DIV_ZERO IRQ (0) - if no handler is set, CPU will get stuck in a reboot loop
-        int x = 2 / 0;
-        
-        kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
+        //console_scroll_up();
+     //#else
+    //     kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
 
         _u64 tsc_freq = get_tsc_freq();
 
-        kprintf("TSC Freq: %llu\n", tsc_freq);
+       // kprintf("TSC Freq: %llu\n", tsc_freq);
 
         _u64 last = read_tsc();
         _u64 curr = 0;
@@ -44,14 +34,15 @@ void main() {
         {
             curr = read_tsc();
 
-            if (curr - last >= tsc_freq)
+            if (curr - last >= tsc_freq / 16)
             {
-                kprintf("Another second has passed...\n");
+                //kprintf("Another second has passed...\n");
                 last = curr;
+                console_scroll_up();
             }
         }
-
-        // Don't let eip loose through memory...
-        halt();
     #endif
+
+    // Don't let eip loose through memory...
+    halt();
 }

@@ -80,6 +80,7 @@ static void linked_list_add_empty(linked_list_t* list, linked_list_node_t* toAdd
 void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring_len)
 {
     kassert(ring != NULL);
+    kassert(buffer != NULL);
     kassert(buf_len > 0);
     kassert(buf_len >= ring_len);
 
@@ -89,11 +90,14 @@ void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring
     ring->idx_start = 0;
     ring->idx_end = 0;
     ring->cnt = 0;
+    ring->total_push = 0;
 }
 
-void ring_buffer_push(ring_buffer_t* ring, size_t elem)
+size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
 {
     kassert(ring != NULL);
+
+    size_t old_elem = 0;
 
     if (ring->cnt < ring->ring_len)
     {
@@ -116,7 +120,16 @@ void ring_buffer_push(ring_buffer_t* ring, size_t elem)
         ring->idx_start = 0;
     }
 
+    if (ring->total_push >= ring->buf_len)
+    {
+        // We are overwriting existing values
+        old_elem = ring->buffer[ring->idx_end];
+    }
+
     ring->buffer[ring->idx_end++] = elem;
+    ring->total_push++;
+
+    return old_elem;
 }
 
 size_t ring_buffer_get(ring_buffer_t* ring, int idx)
@@ -126,9 +139,20 @@ size_t ring_buffer_get(ring_buffer_t* ring, int idx)
     return ring->buffer[idx % ring->buf_len];
 }
 
+size_t ring_buffer_get_last(ring_buffer_t* ring)
+{
+    kassert(ring != NULL);
+    kassert(ring->cnt > 0);
+
+    int idx = (ring->idx_end - 1) % ring->buf_len;
+
+    return ring->buffer[idx];
+}
+
 int ring_buffer_next(ring_buffer_t* ring, int read_idx)
 {
     kassert(read_idx <= ring->buf_len);
+    kassert(read_idx >= 0);
 
     read_idx++;
 
@@ -140,6 +164,29 @@ int ring_buffer_next(ring_buffer_t* ring, int read_idx)
     if (read_idx == ring->buf_len)
     {
         return 0;
+    }
+    else
+    {
+        return read_idx;
+    }
+}
+
+int ring_buffer_prev(ring_buffer_t* ring, int read_idx)
+{
+    kassert(read_idx <= ring->buf_len);
+    kassert(read_idx >= 0);
+
+    read_idx--;
+
+    if (read_idx == ring->idx_end)
+    {
+        return -1;
+    }
+
+    if (read_idx == -1)
+    {
+        //kpanic("here");
+        return ring->buf_len - 1;
     }
     else
     {

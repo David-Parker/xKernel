@@ -3,7 +3,8 @@
 #include <kernel/util/stddef.h>
 #include <kernel/util/util.h>
 
-void* heap;
+_u8* heap;
 
-void* kmalloc(size_t size);
-void* kcalloc(size_t size);
+void* kmalloc(size_t bytes);
+void* kcalloc(size_t bytes);
+void free(_u8* addr);

@@ -27,6 +27,7 @@
 
 #define VGA_MAX_ROWS 25
 #define VGA_MAX_COLS 80
+#define VIDEO_BUFFER_ROWS 100
 
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
@@ -38,6 +39,6 @@ int vga_col_curr;
 
 void console_init();
 void console_clear();
-void console_clear_line(int row);
 void console_putc(char c);
 void console_set_colors(_u8 console, _u8 font);
+void console_scroll_up();

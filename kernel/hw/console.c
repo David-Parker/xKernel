@@ -1,14 +1,18 @@
 #include <kernel/hw/console.h>
 #include <kernel/hw/ioports.h>
 #include <kernel/mem/phymem.h>
+#include <kernel/mem/malloc.h>
+#include <kernel/lib/ds.h>
 #include <kernel/util/util.h>
+#include <kernel/util/debug.h>
 
 int get_cursor_index(int row, int col);
 screen_ptr_t get_screen_addr(int row, int col);
 int get_cursor_pos();
-void set_cursor_pos(int index);
-void vga_clamp();
-void scroll_screen();
+void render_screen();
+
+size_t video_buffer[VIDEO_BUFFER_ROWS] = { 0 };
+ring_buffer_t ring;
 
 int get_cursor_index(int row, int col)
 {
@@ -54,30 +58,9 @@ void set_cursor_pos(int index)
     write_port_byte(PORT_VGA_REG_DATA, (unsigned char)(index & 0xff));
 }
 
-void vga_clamp()
-{
-    if (vga_col_curr >= VGA_MAX_COLS)
-    {
-        vga_col_curr = 0;
-        vga_row_curr++;
-    }
-    if (vga_row_curr >= VGA_MAX_ROWS - 1) // Always leave last line blank
-    {
-        scroll_screen();
-        vga_row_curr = VGA_MAX_ROWS - 2;
-    }
-}
-
-void scroll_screen()
-{
-    screen_ptr_t screen = get_screen_addr(vga_row_curr, vga_col_curr);
-    screen_ptr_t src = get_screen_addr(1,0);
-    screen_ptr_t dest = get_screen_addr(0,0);
-    memcopy(src, dest, (int)(screen - PHY_VGA_MEM_START));
-}
-
 void console_init()
 {
+    ring_buffer_init(&ring, video_buffer, VIDEO_BUFFER_ROWS, VGA_MAX_ROWS);
     vga_console_color = VGA_COLOR_BLACK;
     vga_font_color = VGA_COLOR_WHITE;
     vga_row_curr = 0;
@@ -100,38 +83,107 @@ void console_clear()
     }
 }
 
-void console_clear_line(int row)
+void render_screen()
 {
+    screen_ptr_t video_memory;
+    int i = ring.idx_start;
+    int row = 0;
+    int col = 0;
+    int cur_idx = 0;
 
+    int max_char = 0;
+
+    while (i != -1 && max_char < 25)
+    {
+        char* elem = (char*)ring_buffer_get(&ring, i);
+
+        col = 0;
+
+        while (*elem != '\0')
+        {
+            char c = *elem++;
+
+            video_memory = get_screen_addr(row, col);
+            *(video_memory) = c;
+            *(video_memory+1) = *elem++;
+            col++;
+
+            cur_idx = get_cursor_index(row, col);
+        }
+
+        while (col < VGA_MAX_COLS)
+        {
+            video_memory = get_screen_addr(row, col);
+            *(video_memory) = ' ';
+            *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
+            col++;
+        }
+
+        row++;
+
+        i = ring_buffer_next(&ring, i);
+
+        max_char++;
+    }
+
+    set_cursor_pos(cur_idx);
 }
 
 void console_putc(char c)
 {
-    screen_ptr_t video_memory;
-
-    if (c == '\n')
+    if (ring.cnt == 0)
     {
-        vga_row_curr++;
-        vga_col_curr = 0;
-        vga_clamp();
-    }
-    else
-    {
-        video_memory = get_screen_addr(vga_row_curr, vga_col_curr);
+        char* line = (char*)kcalloc((VGA_MAX_COLS*2) + 1);
+        char* old_line = (char*)ring_buffer_push(&ring, (size_t)line);
 
-        *(video_memory) = c;
-        *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
-
-        vga_col_curr++;
-        vga_clamp();
+        if (old_line != NULL)
+            free(old_line);
     }
 
-    int idx = get_cursor_index(vga_row_curr, vga_col_curr);
-    set_cursor_pos(idx);
+    char* curr_line = (char*)ring_buffer_get_last(&ring);
+    int len = strlen(curr_line) / 2;
+
+    if (c == '\n' || len == VGA_MAX_COLS)
+    {
+        char* line = (char*)kcalloc((VGA_MAX_COLS*2) + 1);
+        char* old_line = (char*)ring_buffer_push(&ring, (size_t)line);
+
+        if (old_line != NULL)
+            free(old_line);
+    }
+
+    if (c != '\n')
+    {
+        curr_line = (char*)ring_buffer_get_last(&ring);
+        len = strlen(curr_line);
+        curr_line[len] = c;
+        curr_line[len + 1] = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
+    }
+
+    render_screen();
 }
 
 void console_set_colors(_u8 console, _u8 font)
 {
     vga_console_color = console;
     vga_font_color = font;
+}
+
+void console_scroll_up()
+{
+    int prev_end = ring_buffer_prev(&ring, ring.idx_end);
+    int prev_start = ring_buffer_prev(&ring, ring.idx_start);
+
+    kassert(prev_end >= 0 && prev_end < ring.buf_len);
+    kassert(prev_start >= 0 && prev_start < ring.buf_len);
+
+    char* line = (char*)ring_buffer_get(&ring, prev_start);
+
+    if (line != NULL)
+    {
+        ring.idx_start = prev_start;
+        ring.idx_end = prev_end;
+    }
+
+    render_screen();
 }
