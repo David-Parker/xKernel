@@ -465,6 +465,40 @@ bool linkedlist_remove_multi()
     return true;
 }
 #pragma endregion
+#pragma region malloc
+bool malloc_one_byte()
+{
+	_u8* heap = __malloc_heap;
+
+	void* mem = kmalloc(1);
+
+	kassert(heap == mem);
+	kassert(__malloc_heap == heap-1);
+}
+
+bool malloc_large()
+{
+	_u8* heap = __malloc_heap;
+
+	void* mem = kmalloc(128);
+
+	kassert(heap == mem);
+	kassert(__malloc_heap == heap-128);
+}
+
+bool malloc_multi()
+{
+	_u8* heap = __malloc_heap;
+
+	void* mem = kmalloc(4);
+
+	kassert(heap == mem);
+	kassert(__malloc_heap == heap-4);
+
+	mem = kmalloc(4);
+	kassert(__malloc_heap == heap-8);
+}
+#pragma endregion
 #pragma region ring_buffer
 bool ring_buffer_spin()
 {
@@ -509,6 +543,34 @@ bool ring_buffer_window()
         size_t elem = ring_buffer_get(&ring, i);
         tassert(elem == x++);
         i = ring_buffer_next(&ring, i);
+    }
+
+    return true;
+}
+
+bool ring_buffer_window_reverse()
+{
+    size_t buffer[8];
+
+    ring_buffer_t ring;
+    ring_buffer_init(&ring, buffer, ARRSIZE(buffer), ARRSIZE(buffer) / 2);
+
+    for (int i = 0; i < 8; ++i)
+    {
+        ring_buffer_push(&ring, i);
+    }
+
+    // [0,1,2,3,(4,5,6,7)]
+
+    int x = 4;
+    int i = ring.idx_start;
+
+    while (i != -1)
+    {
+        size_t elem = ring_buffer_get(&ring, i);
+		//kprintf("%d s:%d e:%d i:%d\n", elem, ring.idx_start, ring.idx_end, i);
+        tassert(elem == x--);
+        i = ring_buffer_prev(&ring, i);
     }
 
     return true;
@@ -647,8 +709,12 @@ void test_init()
     TEST_FUNC(linkedlist_add_multi);
     TEST_FUNC(linkedlist_remove_one);
     TEST_FUNC(linkedlist_remove_multi);
+	TEST_FUNC(malloc_one_byte);
+	TEST_FUNC(malloc_large);
+	TEST_FUNC(malloc_multi);
     TEST_FUNC(ring_buffer_spin);
     TEST_FUNC(ring_buffer_window);
+	TEST_FUNC(ring_buffer_window_reverse);
     TEST_FUNC(ring_buffer_window_indirect);
 	TEST_FUNC(ring_buffer_rewind);
 }

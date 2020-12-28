@@ -89,7 +89,6 @@ void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring
     ring->ring_len = ring_len;
     ring->idx_start = 0;
     ring->idx_end = 0;
-    ring->cnt = 0;
     ring->total_push = 0;
 }
 
@@ -99,15 +98,21 @@ size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
 
     size_t old_elem = 0;
 
-    if (ring->cnt < ring->ring_len)
+    if (ring->total_push >= ring->buf_len)
     {
-        ring->cnt++;
-    }
-    else
-    {
-        ring->idx_start++;
+        // We are overwriting existing values
+        old_elem = ring->buffer[ring->idx_end];
     }
 
+    ring->buffer[ring->idx_end] = elem;
+    ring->total_push++;
+    ring->idx_end++;
+
+    int dist = modulo(ring->idx_end - ring->idx_start, ring->buf_len);
+
+    if (dist > ring->ring_len)
+        ring->idx_start++;
+    
     if (ring->idx_end == ring->buf_len)
     {
         // wrap
@@ -120,15 +125,6 @@ size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
         ring->idx_start = 0;
     }
 
-    if (ring->total_push >= ring->buf_len)
-    {
-        // We are overwriting existing values
-        old_elem = ring->buffer[ring->idx_end];
-    }
-
-    ring->buffer[ring->idx_end++] = elem;
-    ring->total_push++;
-
     return old_elem;
 }
 
@@ -136,15 +132,14 @@ size_t ring_buffer_get(ring_buffer_t* ring, int idx)
 {
     kassert(ring != NULL);
 
-    return ring->buffer[idx % ring->buf_len];
+    return ring->buffer[modulo(idx, ring->buf_len)];
 }
 
 size_t ring_buffer_get_last(ring_buffer_t* ring)
 {
     kassert(ring != NULL);
-    kassert(ring->cnt > 0);
 
-    int idx = (ring->idx_end - 1) % ring->buf_len;
+    int idx = modulo(ring->idx_end - 1, ring->buf_len);
 
     return ring->buffer[idx];
 }
@@ -154,16 +149,11 @@ int ring_buffer_next(ring_buffer_t* ring, int read_idx)
     kassert(read_idx <= ring->buf_len);
     kassert(read_idx >= 0);
 
-    read_idx++;
+    read_idx = modulo(read_idx + 1, ring->buf_len);
 
     if (read_idx == ring->idx_end)
     {
         return -1;
-    }
-
-    if (read_idx == ring->buf_len)
-    {
-        return 0;
     }
     else
     {
@@ -176,17 +166,11 @@ int ring_buffer_prev(ring_buffer_t* ring, int read_idx)
     kassert(read_idx <= ring->buf_len);
     kassert(read_idx >= 0);
 
-    read_idx--;
+    read_idx = modulo(read_idx - 1, ring->buf_len);
 
     if (read_idx == ring->idx_end)
     {
         return -1;
-    }
-
-    if (read_idx == -1)
-    {
-        //kpanic("here");
-        return ring->buf_len - 1;
     }
     else
     {

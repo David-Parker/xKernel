@@ -19,13 +19,14 @@ void main() {
 
     #ifdef UNIT_TEST
         test_driver();
-        //console_scroll_up();
-     //#else
-    //     kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
+    #else
+        kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
+    #endif
 
+        // Scroll the screen for a bit
         _u64 tsc_freq = get_tsc_freq();
 
-       // kprintf("TSC Freq: %llu\n", tsc_freq);
+        // kprintf("TSC Freq: %llu\n", tsc_freq);
 
         _u64 last = read_tsc();
         _u64 curr = 0;
@@ -34,14 +35,13 @@ void main() {
         {
             curr = read_tsc();
 
-            if (curr - last >= tsc_freq / 16)
+            if (curr - last >= tsc_freq / 8)
             {
                 //kprintf("Another second has passed...\n");
                 last = curr;
                 console_scroll_up();
             }
         }
-    #endif
 
     // Don't let eip loose through memory...
     halt();

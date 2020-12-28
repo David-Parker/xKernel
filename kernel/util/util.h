@@ -9,3 +9,4 @@ int strlen(char* str);
 void halt();
 int min(int lhs, int rhs);
 int max(int lhs, int rhs);
+int modulo(int a, int b);

@@ -38,7 +38,6 @@ typedef struct ring_buffer
     int ring_len;
     int idx_start;
     int idx_end;
-    int cnt;
     _u64 total_push;
 } ring_buffer_t, *ring_buffer_ptr_t;
 
