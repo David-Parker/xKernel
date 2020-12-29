@@ -29,17 +29,28 @@ void main() {
         // kprintf("TSC Freq: %llu\n", tsc_freq);
 
         _u64 last = read_tsc();
+        _u64 last_second = last;
         _u64 curr = 0;
+        bool dir = 0;
 
         while (true)
         {
             curr = read_tsc();
 
-            if (curr - last >= tsc_freq / 8)
+            if (curr - last >= tsc_freq / 16)
             {
                 //kprintf("Another second has passed...\n");
                 last = curr;
-                console_scroll_up();
+
+                if (dir == 0)
+                    console_scroll_down();
+                else
+                    console_scroll_up();
+            }
+            else if (curr - last_second >= tsc_freq)
+            {
+                dir = !dir;
+                last_second = curr;
             }
         }
 

@@ -11,8 +11,9 @@ screen_ptr_t get_screen_addr(int row, int col);
 int get_cursor_pos();
 void render_screen();
 
-size_t video_buffer[VIDEO_BUFFER_ROWS] = { 0 };
+size_t* video_buffer;
 ring_buffer_t video_ring;
+ring_buffer_t video_ring_reader;
 
 int get_cursor_index(int row, int col)
 {
@@ -60,6 +61,7 @@ void set_cursor_pos(int index)
 
 void console_init()
 {
+    video_buffer = (size_t*)kcalloc(VIDEO_BUFFER_ROWS * sizeof(size_t));
     ring_buffer_init(&video_ring, video_buffer, VIDEO_BUFFER_ROWS, VGA_MAX_ROWS);
     vga_console_color = VGA_COLOR_BLACK;
     vga_font_color = VGA_COLOR_WHITE;
@@ -83,21 +85,24 @@ void console_clear()
     }
 }
 
+void console_flush()
+{
+    render_screen();
+}
+
 void render_screen()
 {
-    kassert(video_ring.idx_start != video_ring.idx_end);
+    kassert(video_ring_reader.idx_start != video_ring_reader.idx_end);
 
     screen_ptr_t video_memory;
-    int i = video_ring.idx_start;
+    int i = video_ring_reader.idx_start;
     int row = 0;
     int col = 0;
     int cur_idx = 0;
 
-    int prev_i = 0;
-
     while (i != -1 )
     {
-        char* elem = (char*)ring_buffer_get(&video_ring, i);
+        char* elem = (char*)ring_buffer_get(&video_ring_reader, i);
 
         col = 0;
 
@@ -122,8 +127,8 @@ void render_screen()
         }
 
         row++;
-        prev_i = i;
-        i = ring_buffer_next(&video_ring, i);
+
+        i = ring_buffer_next(&video_ring_reader, i);
     }
 
     set_cursor_pos(cur_idx);
@@ -145,6 +150,7 @@ void console_putc(char c)
 
     if (c == '\n' || len == VGA_MAX_COLS)
     {
+        console_flush();
         char* line = (char*)kcalloc((VGA_MAX_COLS*2) + 1);
         char* old_line = (char*)ring_buffer_push(&video_ring, (size_t)line);
 
@@ -160,7 +166,7 @@ void console_putc(char c)
         curr_line[len + 1] = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
     }
 
-    render_screen();
+    ring_buffer_copy(&video_ring, &video_ring_reader);
 }
 
 void console_set_colors(_u8 console, _u8 font)
@@ -171,16 +177,44 @@ void console_set_colors(_u8 console, _u8 font)
 
 void console_scroll_up()
 {
-    int prev_start = ring_buffer_prev(&video_ring, video_ring.idx_start);
-    int prev_end = ring_buffer_prev(&video_ring, video_ring.idx_end);
+    if (ring_buffer_distance(
+        video_ring_reader.idx_start, 
+        video_ring.idx_start, 
+        video_ring.buf_len) >= (VIDEO_BUFFER_ROWS - VGA_MAX_ROWS))
+    {
+        return;
+    }
 
-    char* line = (char*)ring_buffer_get(&video_ring, prev_start);
+    int prev_start = ring_buffer_prev(&video_ring_reader, video_ring_reader.idx_start);
+    int prev_end = ring_buffer_prev(&video_ring_reader, video_ring_reader.idx_end);
+
+    char* line = (char*)ring_buffer_get(&video_ring_reader, prev_start);
 
     if (line != NULL)
     {
-        kassert(prev_end != prev_start);
-        video_ring.idx_start = prev_start;
-        video_ring.idx_end = prev_end;
+        video_ring_reader.idx_start = prev_start;
+        video_ring_reader.idx_end = prev_end;
+    }
+
+    render_screen();
+}
+
+void console_scroll_down()
+{
+    if (video_ring_reader.idx_start >= video_ring.idx_start)
+    {
+        return;
+    }
+
+    int next_start = ring_buffer_next(&video_ring_reader, video_ring_reader.idx_start);
+    int next_end = ring_buffer_next(&video_ring_reader, video_ring_reader.idx_end);
+
+    char* line = (char*)ring_buffer_get(&video_ring_reader, next_start);
+
+    if (line != NULL)
+    {
+        video_ring_reader.idx_start = next_start;
+        video_ring_reader.idx_end = next_end;
     }
 
     render_screen();

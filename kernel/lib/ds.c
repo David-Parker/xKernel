@@ -92,6 +92,11 @@ void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring
     ring->total_push = 0;
 }
 
+void ring_buffer_copy(ring_buffer_t* from, ring_buffer_t* to)
+{
+    memcopy((_u8*)from, (_u8*)to, sizeof(ring_buffer_t));
+}
+
 size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
 {
     kassert(ring != NULL);
@@ -108,7 +113,7 @@ size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
     ring->total_push++;
     ring->idx_end++;
 
-    int dist = modulo(ring->idx_end - ring->idx_start, ring->buf_len);
+    int dist = ring_buffer_distance(ring->idx_start, ring->idx_end, ring->buf_len);
 
     if (dist > ring->ring_len)
         ring->idx_start++;
@@ -176,4 +181,9 @@ int ring_buffer_prev(ring_buffer_t* ring, int read_idx)
     {
         return read_idx;
     }
+}
+
+int ring_buffer_distance(int start_idx, int end_idx, int buf_len)
+{
+    return modulo(end_idx - start_idx, buf_len);
 }

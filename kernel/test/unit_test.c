@@ -727,6 +727,8 @@ void test_driver()
 
 	for (int i = 0; i < test_no; ++i)
 	{
+		kprintf("[%d/%d] ", i+1, test_no+1);
+		
 		if (unit_tests[i].func() == true)
 		{
 			passed++;
