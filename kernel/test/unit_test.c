@@ -709,9 +709,9 @@ void test_init()
     TEST_FUNC(linkedlist_add_multi);
     TEST_FUNC(linkedlist_remove_one);
     TEST_FUNC(linkedlist_remove_multi);
-	TEST_FUNC(malloc_one_byte);
-	TEST_FUNC(malloc_large);
-	TEST_FUNC(malloc_multi);
+	// TEST_FUNC(malloc_one_byte);
+	// TEST_FUNC(malloc_large);
+	// TEST_FUNC(malloc_multi);
     TEST_FUNC(ring_buffer_spin);
     TEST_FUNC(ring_buffer_window);
 	TEST_FUNC(ring_buffer_window_reverse);
@@ -724,6 +724,8 @@ void test_driver()
 	test_init();
 
 	int passed = 0;
+
+    kprintf("Starting kernel unit tests...\n");
 
 	for (int i = 0; i < test_no; ++i)
 	{

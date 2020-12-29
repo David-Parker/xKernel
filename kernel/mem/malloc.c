@@ -15,6 +15,10 @@ void* kmalloc(size_t bytes)
 
     kassert((void*)(__malloc_heap - bytes) > esp);
 
+    // 8-byte alignment
+    _u32 offset = (8 - ((_u32)__malloc_heap % 8));
+    __malloc_heap -= offset;
+
     void* old = __malloc_heap;
     __malloc_heap -= bytes;
 
@@ -24,7 +28,7 @@ void* kmalloc(size_t bytes)
 void* kcalloc(size_t bytes)
 {
     void* mem = kmalloc(bytes);
-    mem_set(mem, 0, bytes);
+    memset(mem, 0, bytes);
 }
 
 void free(_u8* addr)

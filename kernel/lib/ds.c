@@ -94,7 +94,7 @@ void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring
 
 void ring_buffer_copy(ring_buffer_t* from, ring_buffer_t* to)
 {
-    memcopy((_u8*)from, (_u8*)to, sizeof(ring_buffer_t));
+    memcpy((_u8*)from, (_u8*)to, sizeof(ring_buffer_t));
 }
 
 size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
@@ -147,6 +147,13 @@ size_t ring_buffer_get_last(ring_buffer_t* ring)
     int idx = modulo(ring->idx_end - 1, ring->buf_len);
 
     return ring->buffer[idx];
+}
+
+void ring_buffer_clear(ring_buffer_t* ring)
+{
+    ring->idx_start = 0;
+    ring->idx_end = 0;
+    ring->total_push = 0;
 }
 
 int ring_buffer_next(ring_buffer_t* ring, int read_idx)

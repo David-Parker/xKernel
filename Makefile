@@ -58,6 +58,11 @@ test: build-test run
 
 test-debug: build-test debug
 
+qemu: os-image.bin
+	qemu-system-i386 -s -S -fda ${BINDIR}/os-image.bin
+
+qemu-test: build-test qemu
+
 # Open the connection to qemu and load our kernel-object file with symbols
 debug: os-image.bin
 	qemu-system-i386 -s -S -fda ${BINDIR}/os-image.bin &

@@ -42,5 +42,6 @@ void console_clear();
 void console_flush();
 void console_putc(char c);
 void console_set_colors(_u8 console, _u8 font);
+void console_scroll_n(int n);
 void console_scroll_up();
 void console_scroll_down();

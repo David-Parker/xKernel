@@ -8,7 +8,7 @@ void idt_init()
     interrupt_descriptor_table.limit = sizeof(idt_entry_t) * 256 -1;
     interrupt_descriptor_table.base  = (_u32)&idt_entries;
 
-    mem_set((_u8*)&idt_entries, 0, sizeof(idt_entry_t)*256);
+    memset((_u8*)&idt_entries, 0, sizeof(idt_entry_t)*256);
 
     idt_set_entry(IDT_INTR_DIV_ZERO, (_u32)isr0, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
     idt_set_entry(IDT_INTR_DEBUG_EX, (_u32)isr1, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
@@ -56,6 +56,23 @@ void idt_init()
     write_port_byte(0xA1, 0x01);
     write_port_byte(0x21, 0x0);
     write_port_byte(0xA1, 0x0);
+
+    idt_set_entry(32, (_u32)irq0, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(33, (_u32)irq1, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(34, (_u32)irq2, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(35, (_u32)irq3, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(36, (_u32)irq4, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(37, (_u32)irq5, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(38, (_u32)irq6, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(39, (_u32)irq7, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(40, (_u32)irq8, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(41, (_u32)irq9, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(42, (_u32)irq10, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(43, (_u32)irq11, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(44, (_u32)irq12, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(45, (_u32)irq13, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(46, (_u32)irq14, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
+    idt_set_entry(47, (_u32)irq15, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
 
     idt_set((_u32)&interrupt_descriptor_table);
 }

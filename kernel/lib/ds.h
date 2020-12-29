@@ -46,6 +46,7 @@ void ring_buffer_copy(ring_buffer_t* from, ring_buffer_t* to);
 size_t ring_buffer_push(ring_buffer_t* ring, size_t elem);
 size_t ring_buffer_get(ring_buffer_t* ring, int idx);
 size_t ring_buffer_get_last(ring_buffer_t* ring);
+void ring_buffer_clear(ring_buffer_t* ring);
 int ring_buffer_next(ring_buffer_t* ring, int read_idx);
 int ring_buffer_prev(ring_buffer_t* ring, int read_idx);
 int ring_buffer_distance(int start_idx, int end_idx, int buf_len);

@@ -1,7 +1,7 @@
 #include <kernel/hw/tsc.h>
 #include <kernel/hw/msr.h>
 #include <kernel/hw/cpuid.h>
-#include <kernel/hw/time.h>
+#include <kernel/hw/timer.h>
 #include <kernel/lib/iolib.h>
 
 static _u64 g_cycles_hz = 0;
@@ -90,37 +90,34 @@ _u64 get_tsc_freq()
         _u64 tsc1;
         _u64 tsc2;
 
-        // TODO: temp tsc "guess" until we can measure
-        cycles_hz = 3500000000ull;
+        for (index = 0; index < 3; index += 1)
+        {
+            tsc0 = read_tsc();
+            time = ktime_get_ns();
 
-        // for (index = 0; index < 3; index += 1)
-        // {
-        //     tsc0 = read_tsc();
-        //     time = ktime_get_ns();
+            do {
+                time1 = ktime_get_ns();
+            } while (time1 == time);
 
-        //     do {
-        //         time1 = ktime_get_ns();
-        //     } while (time1 == time);
+            tsc1 = read_tsc();
 
-        //     tsc1 = read_tsc();
+            do {
+                time2 = ktime_get_ns();
+            } while (time2 - time1 < 1 * NANOS_PER_SEC);
 
-        //     do {
-        //         time2 = ktime_get_ns();
-        //     } while (time2 - time1 < 1 * NANOS_PER_SEC);
+            tsc2 = read_tsc();
 
-        //     tsc2 = read_tsc();
+            if ((gap == 0) ||
+                ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
 
-        //     if ((gap == 0) ||
-        //         ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
+                gap = tsc2 - tsc0;
+                cycles_hz = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
 
-        //         gap = tsc2 - tsc0;
-        //         cyclesPerSec = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
-
-        //         // round to nearest mhz
-        //         cyclesPerSec += 1000000 / 2;
-        //         cyclesPerSec -= (cyclesPerSec % 1000000);
-        //     }
-        // }
+                // round to nearest mhz
+                cycles_hz += 1000000 / 2;
+                cycles_hz -= (cycles_hz % 1000000);
+            }
+        }
 
         g_cycles_hz = cycles_hz;
 

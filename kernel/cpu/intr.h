@@ -18,7 +18,9 @@ typedef struct registers
 typedef void (*isr_t)(registers_t*);
 isr_t intr_handlers[256];
 
+void intr_init();
 void isr_handler(registers_t* irq);
+void irq_handler(registers_t* regs);
 void isr_handle_exception(registers_t* irq);
 void intr_register_handler(int intr_no, isr_t intr_handler);
 _u32 intr_get_flags();
@@ -58,3 +60,21 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
+
+// irq stubs
+extern void irq0();
+extern void irq1();
+extern void irq2();
+extern void irq3();
+extern void irq4();
+extern void irq5();
+extern void irq6();
+extern void irq7();
+extern void irq8();
+extern void irq9();
+extern void irq10();
+extern void irq11();
+extern void irq12();
+extern void irq13();
+extern void irq14();
+extern void irq15();
