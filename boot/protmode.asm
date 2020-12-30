@@ -16,7 +16,7 @@ init_pm: ; we are now using 32-bit instructions
     mov fs, ax
     mov gs, ax
 
-    mov ebp, 0x90000 ; 6. update the stack right at the top of the free space
+    mov ebp, 0x90000
     mov esp, ebp
 
     call Prot_Main ; 7. Call a well-known label with useful code

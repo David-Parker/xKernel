@@ -1,4 +1,5 @@
 #include <kernel/util/debug.h>
+#include <kernel/hw/console.h>
 
 void kpanic(char* message)
 {
@@ -9,11 +10,13 @@ void kpanic(char* message)
     loops++;
     if (loops == 1)
     {
-        kprintf("Kernel panic invoked, shutting down kernel.\n%s", message);
+        console_clear();
+        console_simple_print(0, "Kernel panic invoked, shutting down kernel.");
+        console_simple_print(1, message);
     }
     if (loops == 2)
     {
-        kprintf("Kernel panic recursion.\n%s", message);
+        console_simple_print(0, "Kernel panic recursion.");
     }
     else
     {

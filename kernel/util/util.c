@@ -1,17 +1,39 @@
 #include <kernel/util/util.h>
 
-// TODO: more efficient to implement with SIMD
-void memcpy(char *source, char *dest, int nbytes)
+void * memcpy ( void * destination, const void * source, size_t num )
 {
-    int i;
-    for (i = 0; i < nbytes; i++) {
-        *(dest + i) = *(source + i);
+    size_t * plDst = (size_t*) destination;
+    size_t const * plSrc = (size_t const *) source;
+    _u8 * pcDst = (_u8 *) plDst;
+    _u8 const * pcSrc = (_u8 const *) plSrc;
+
+    // Only do multi-byte aligned copies for "larger" copies
+    if (num > 32 && !align_4(source) && !align_4(destination))
+    {
+        while (num >= 4)
+        {
+            *plDst++ = *plSrc++;
+            num -= 4;
+        }
     }
+
+    while (num--)
+    {
+        *pcDst++ = *pcSrc++;
+    }
+
+    return destination;
 }
 
-void memset(_u8 *dest, _u8 val, _u32 len) {
-    _u8 *temp = (_u8 *)dest;
-    for ( ; len != 0; len--) *temp++ = val;
+void* memset (void * ptr, int value, size_t num ) {
+    _u8 *temp = (_u8*)ptr;
+
+    while (num--)
+    {
+        *temp++ = value;
+    }
+
+    return ptr;
 }
 
 bool strcmp(char* lhs, char* rhs)

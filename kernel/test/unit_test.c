@@ -466,37 +466,74 @@ bool linkedlist_remove_multi()
 }
 #pragma endregion
 #pragma region malloc
-bool malloc_one_byte()
+bool malloc_aligned_one_byte()
 {
-	_u8* heap = __malloc_heap;
+    void* mem = kmalloc(1);
 
-	void* mem = kmalloc(1);
+    tassert((size_t)mem % 8 == 0);
 
-	kassert(heap == mem);
-	kassert(__malloc_heap == heap-1);
+    return true;
 }
 
-bool malloc_large()
+bool malloc_aligned_large()
 {
-	_u8* heap = __malloc_heap;
+    int* mem = (int*)kmalloc(4096 * sizeof(int));
 
-	void* mem = kmalloc(128);
+    tassert((size_t)mem % 8 == 0);
 
-	kassert(heap == mem);
-	kassert(__malloc_heap == heap-128);
+    return true;
 }
 
-bool malloc_multi()
+bool malloc_aligned_multi()
 {
-	_u8* heap = __malloc_heap;
+    for (int i = 0; i < 10; ++i)
+    {
+        void* mem = kmalloc(3);
+        tassert((size_t)mem % 8 == 0);
+    }
 
-	void* mem = kmalloc(4);
+    return true;
+}
 
-	kassert(heap == mem);
-	kassert(__malloc_heap == heap-4);
+bool malloc_mem_corruption()
+{
+    int* buf1 = (int*)kmalloc(4096 * sizeof(int));
 
-	mem = kmalloc(4);
-	kassert(__malloc_heap == heap-8);
+    for (int i = 0; i < 4096; ++i)
+    {
+        *(buf1+i) = 0xdeadbeef;
+    }
+
+    int* buf2 = (int*)kmalloc(4096 * sizeof(int));
+
+    for (int i = 0; i < 4096; ++i)
+    {
+        *(buf2+i) = 0xf00df33d;
+    }
+
+    for (int i = 0; i < 4096; ++i)
+    {
+        tassert(*(buf1+i) == 0xdeadbeef);
+        tassert(*(buf2+i) == 0xf00df33d);
+    }
+
+    return true;
+}
+
+bool calloc_all_zero()
+{
+    int* mem = (int*)kcalloc(4096 * sizeof(int));
+
+    //kprintf("%x\n", mem);
+
+    for (int i = 0; i < 4096; ++i)
+    {
+        tassert(*(mem+i) == 0);
+    }
+
+    tassert((size_t)mem % 8 == 0);
+
+    return true;
 }
 #pragma endregion
 #pragma region ring_buffer
@@ -568,7 +605,7 @@ bool ring_buffer_window_reverse()
     while (i != -1)
     {
         size_t elem = ring_buffer_get(&ring, i);
-		//kprintf("%d s:%d e:%d i:%d\n", elem, ring.idx_start, ring.idx_end, i);
+        //kprintf("%d s:%d e:%d i:%d\n", elem, ring.idx_start, ring.idx_end, i);
         tassert(elem == x--);
         i = ring_buffer_prev(&ring, i);
     }
@@ -608,12 +645,12 @@ bool ring_buffer_window_indirect()
 
 bool ring_buffer_rewind()
 {
-	size_t buffer[8] = {0};
+    size_t buffer[8] = {0};
 
-	ring_buffer_t ring;
+    ring_buffer_t ring;
     ring_buffer_init(&ring, buffer, ARRSIZE(buffer), ARRSIZE(buffer) / 2);
 
-	for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         size_t* mem = (size_t*)kmalloc(sizeof(size_t));
         *mem = i;
@@ -621,39 +658,39 @@ bool ring_buffer_rewind()
         ring_buffer_push(&ring, (size_t)mem);
     }
 
-	size_t* elem = (size_t*)ring_buffer_get(&ring, ring.idx_start);
-	tassert(*elem == 1);
+    size_t* elem = (size_t*)ring_buffer_get(&ring, ring.idx_start);
+    tassert(*elem == 1);
 
-	// rewind
-	int prev_start = ring_buffer_prev(&ring, ring.idx_start);
+    // rewind
+    int prev_start = ring_buffer_prev(&ring, ring.idx_start);
     int prev_end = ring_buffer_prev(&ring, ring.idx_end);
 
-	ring.idx_start = prev_start;
-	ring.idx_end = prev_end;
+    ring.idx_start = prev_start;
+    ring.idx_end = prev_end;
 
-	elem = (size_t*)ring_buffer_get(&ring, ring.idx_start);
-	tassert(*elem == 0);
+    elem = (size_t*)ring_buffer_get(&ring, ring.idx_start);
+    tassert(*elem == 0);
 
-	// rewind
-	prev_start = ring_buffer_prev(&ring, ring.idx_start);
+    // rewind
+    prev_start = ring_buffer_prev(&ring, ring.idx_start);
     prev_end = ring_buffer_prev(&ring, ring.idx_end);
 
-	ring.idx_start = prev_start;
-	ring.idx_end = prev_end;
+    ring.idx_start = prev_start;
+    ring.idx_end = prev_end;
 
-	elem = (size_t*)ring_buffer_get(&ring, ring.idx_start);
-	tassert(elem == NULL);
+    elem = (size_t*)ring_buffer_get(&ring, ring.idx_start);
+    tassert(elem == NULL);
 
-	for (int i = 0; i < 16; ++i)
-	{
-		prev_start = ring_buffer_prev(&ring, ring.idx_start);
-    	prev_end = ring_buffer_prev(&ring, ring.idx_end);
+    for (int i = 0; i < 16; ++i)
+    {
+        prev_start = ring_buffer_prev(&ring, ring.idx_start);
+        prev_end = ring_buffer_prev(&ring, ring.idx_end);
 
-		ring.idx_start = prev_start;
-		ring.idx_end = prev_end;
-	}
+        ring.idx_start = prev_start;
+        ring.idx_end = prev_end;
+    }
 
-	return true;
+    return true;
 }
 #pragma endregion
 
@@ -709,45 +746,47 @@ void test_init()
     TEST_FUNC(linkedlist_add_multi);
     TEST_FUNC(linkedlist_remove_one);
     TEST_FUNC(linkedlist_remove_multi);
-	// TEST_FUNC(malloc_one_byte);
-	// TEST_FUNC(malloc_large);
-	// TEST_FUNC(malloc_multi);
+    TEST_FUNC(malloc_aligned_one_byte);
+    TEST_FUNC(malloc_aligned_large);
+    TEST_FUNC(malloc_aligned_multi);
+    TEST_FUNC(malloc_mem_corruption);
+    TEST_FUNC(calloc_all_zero);
     TEST_FUNC(ring_buffer_spin);
     TEST_FUNC(ring_buffer_window);
-	TEST_FUNC(ring_buffer_window_reverse);
+    TEST_FUNC(ring_buffer_window_reverse);
     TEST_FUNC(ring_buffer_window_indirect);
-	TEST_FUNC(ring_buffer_rewind);
+    TEST_FUNC(ring_buffer_rewind);
 }
 
 void test_driver()
 {
-	test_init();
+    test_init();
 
-	int passed = 0;
+    int passed = 0;
 
     kprintf("Starting kernel unit tests...\n");
 
-	for (int i = 0; i < test_no; ++i)
-	{
-		kprintf("[%d/%d] ", i+1, test_no+1);
-		
-		if (unit_tests[i].func() == true)
-		{
-			passed++;
-			console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_GREEN);
-			kprintf("PASSED ");
-			console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
-			kprintf("%s()\n", unit_tests[i].str);
-		}
-		else
-		{
-			console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_RED);
-			kprintf("FAILED ");
-			console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
-			kprintf("%s()\n", unit_tests[i].str);
-		}
-	}
+    for (int i = 0; i < test_no; ++i)
+    {
+        kprintf("[%d/%d] ", i+1, test_no+1);
+        
+        if (unit_tests[i].func() == true)
+        {
+            passed++;
+            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_GREEN);
+            kprintf("PASSED ");
+            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
+            kprintf("%s()\n", unit_tests[i].str);
+        }
+        else
+        {
+            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_RED);
+            kprintf("FAILED ");
+            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
+            kprintf("%s()\n", unit_tests[i].str);
+        }
+    }
 
-	kprintf("%d out of %d tests passed.\n", passed, test_no);
+    kprintf("%d out of %d tests passed.\n", passed, test_no);
 }
 #endif

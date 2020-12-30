@@ -8,9 +8,9 @@
 #define kassert(cond) \
 do { \
     if (!(cond)) { \
-        char buff[4096]; \
-        ksprintf("Assertion failed at %s %s:%d\n", buff, 4096, __FILE__, __func__, __LINE__); \
-        kpanic(buff);\
+        char buf[512]; \
+        ksprintf("Assertion failed at %s %s:%d", buf, ARRSIZE(buf), __FILE__, __func__, __LINE__); \
+        kpanic(buf);\
     } \
 } \
 while (0);

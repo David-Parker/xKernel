@@ -8,7 +8,7 @@ void idt_init()
     interrupt_descriptor_table.limit = sizeof(idt_entry_t) * 256 -1;
     interrupt_descriptor_table.base  = (_u32)&idt_entries;
 
-    memset((_u8*)&idt_entries, 0, sizeof(idt_entry_t)*256);
+    memset(&idt_entries, 0, sizeof(idt_entry_t)*256);
 
     idt_set_entry(IDT_INTR_DIV_ZERO, (_u32)isr0, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);
     idt_set_entry(IDT_INTR_DEBUG_EX, (_u32)isr1, 0x08, IDT_FLAG_SEG_PRESENT | IDT_FLAG_PRIV_RING_0 | IDT_FLAG_ALWAYS_14);

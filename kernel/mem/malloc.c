@@ -1,8 +1,9 @@
 #include <kernel/mem/malloc.h>
 #include <kernel/mem/phymem.h>
 #include <kernel/util/debug.h>
+#include <kernel/util/util.h>
 
-_u8* __malloc_heap = (_u8*)PHY_KERNEL_HEAP_START;
+_u8* __malloc_heap = (_u8*)PHY_KERNEL_HEAP;
 
 // World's simplest malloc function. 100% leak. Enough to be unblocked for now...
 void* kmalloc(size_t bytes)
@@ -13,14 +14,20 @@ void* kmalloc(size_t bytes)
         "mov %%esp, %0" : "=r" (esp)
     );
 
-    kassert((void*)(__malloc_heap - bytes) > esp);
+    kassert((void*)(__malloc_heap + bytes) < esp);
 
     // 8-byte alignment
-    _u32 offset = (8 - ((_u32)__malloc_heap % 8));
-    __malloc_heap -= offset;
+    size_t offset = align_8(__malloc_heap);
+
+    if (offset > 0)
+    {
+        __malloc_heap += (8 - offset);
+    }
 
     void* old = __malloc_heap;
-    __malloc_heap -= bytes;
+
+    // move down heap pointer
+    __malloc_heap += bytes;
 
     return old;
 }

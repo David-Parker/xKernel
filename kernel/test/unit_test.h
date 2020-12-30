@@ -3,6 +3,7 @@
 #include <kernel/util/stddef.h>
 
 typedef bool (*test_func)(void);
+
 typedef struct
 {
     test_func func;
@@ -23,8 +24,7 @@ while(0);
 #define tassert(cond) \
 do { \
     if (!(cond)) { \
-        kprintf("Test assertion failed at %s %s:%d\n", __FILE__, __func__, __LINE__); \
-        halt(); \
+        kprintf("Test assert failed: %s %s:%d\n", __FILE__, __func__, __LINE__); \
         return false; \
     } \
 } \

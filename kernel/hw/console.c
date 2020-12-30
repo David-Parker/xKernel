@@ -11,7 +11,6 @@ screen_ptr_t get_screen_addr(int row, int col);
 int get_cursor_pos();
 void render_screen();
 
-size_t* video_buffer;
 ring_buffer_t video_ring;
 ring_buffer_t video_ring_reader;
 
@@ -61,8 +60,7 @@ void set_cursor_pos(int index)
 
 void console_init()
 {
-    video_buffer = (size_t*)kcalloc(VIDEO_BUFFER_ROWS * sizeof(size_t));
-    ring_buffer_init(&video_ring, video_buffer, VIDEO_BUFFER_ROWS, VGA_MAX_ROWS);
+    ring_buffer_init(&video_ring, (size_t*)kcalloc(VIDEO_BUFFER_ROWS * sizeof(size_t)), VIDEO_BUFFER_ROWS, VGA_MAX_ROWS);
     vga_console_color = VGA_COLOR_BLACK;
     vga_font_color = VGA_COLOR_WHITE;
     vga_row_curr = 0;
@@ -99,12 +97,6 @@ void render_screen()
     int row = 0;
     int col = 0;
     int cur_idx = 0;
-
-    // video_memory = get_screen_addr(0, 0);
-    // *(video_memory) = (char)('0' + video_ring_reader.idx_end);
-    // *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
-
-    // halt();
 
     while (i != -1)
     {
@@ -145,6 +137,7 @@ void console_putc(char c)
     if (video_ring.total_push == 0)
     {
         char* line = (char*)kcalloc((VGA_MAX_COLS*2) + 1);
+        kassert((size_t)line >= PHY_KERNEL_HEAP);
         char* old_line = (char*)ring_buffer_push(&video_ring, (size_t)line);
 
         if (old_line != NULL)
@@ -152,6 +145,10 @@ void console_putc(char c)
     }
 
     char* curr_line = (char*)ring_buffer_get_last(&video_ring);
+
+    kassert(curr_line != NULL);
+    kassert(curr_line >= PHY_KERNEL_HEAP);
+
     int len = strlen(curr_line) / 2;
 
     if (c == '\n' || len == VGA_MAX_COLS)
@@ -168,12 +165,28 @@ void console_putc(char c)
     if (c != '\n')
     {
         curr_line = (char*)ring_buffer_get_last(&video_ring);
+        kassert(curr_line >= PHY_KERNEL_HEAP);
+
         len = strlen(curr_line);
         curr_line[len] = c;
         curr_line[len + 1] = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
     }
 
     ring_buffer_copy(&video_ring, &video_ring_reader);
+}
+
+void console_simple_print(int row, char* str)
+{
+    screen_ptr_t video_memory;
+
+    video_memory = get_screen_addr(row, 0);
+
+    while (*str != '\0')
+    {
+        *(video_memory) = *str++;
+        *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
+        video_memory+=2;
+    }
 }
 
 void console_set_colors(_u8 console, _u8 font)
@@ -205,6 +218,7 @@ void console_scroll_n(int n)
 
             if (line != NULL)
             {
+                kassert(line >= PHY_KERNEL_HEAP); 
                 video_ring_reader.idx_start = prev_start;
                 video_ring_reader.idx_end = prev_end;
             }
@@ -226,6 +240,7 @@ void console_scroll_n(int n)
 
             if (line != NULL)
             {
+                kassert(line >= PHY_KERNEL_HEAP); 
                 video_ring_reader.idx_start = next_start;
                 video_ring_reader.idx_end = next_end;
             }

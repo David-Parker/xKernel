@@ -49,7 +49,7 @@ kernel.elf: boot/kernel_entry.o ${OBJ}
 	${LD} -o ${BINDIR}/$@ -Ttext 0x1200 $^ -L/usr/local/i386elfgcc/lib/gcc/i386-elf/4.9.1 -lgcc
 
 run: os-image.bin
-	qemu-system-i386 -drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
+	qemu-system-i386 -m 2g -drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
 
 build-test:
 	$(eval override CFLAGS += -D=UNIT_TEST)
@@ -59,7 +59,7 @@ test: build-test run
 test-debug: build-test debug
 
 qemu: os-image.bin
-	qemu-system-i386 -s -S -fda ${BINDIR}/os-image.bin
+	qemu-system-i386 -s -S -m 2g -fda ${BINDIR}/os-image.bin
 
 qemu-test: build-test qemu
 

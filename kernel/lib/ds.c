@@ -94,7 +94,7 @@ void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring
 
 void ring_buffer_copy(ring_buffer_t* from, ring_buffer_t* to)
 {
-    memcpy((_u8*)from, (_u8*)to, sizeof(ring_buffer_t));
+    memcpy(to, from, sizeof(ring_buffer_t));
 }
 
 size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
@@ -108,7 +108,7 @@ size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
         // We are overwriting existing values
         old_elem = ring->buffer[ring->idx_end];
     }
-
+    
     ring->buffer[ring->idx_end] = elem;
     ring->total_push++;
     ring->idx_end++;

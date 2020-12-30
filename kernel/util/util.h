@@ -2,8 +2,11 @@
 
 #include <kernel/util/stddef.h>
 
-void memcpy(char *source, char *dest, int nbytes);
-void memset(_u8 *dest, _u8 val, _u32 len);
+#define align_4(addr) ((size_t)addr & 0x3)
+#define align_8(addr) ((size_t)addr & 0x7)
+
+void * memcpy (void * destination, const void * source, size_t num );
+void * memset (void * ptr, int value, size_t num );
 bool strcmp(char* lhs, char* rhs);
 int strlen(char* str);
 void halt();

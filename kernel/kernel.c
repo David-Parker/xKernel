@@ -8,6 +8,7 @@
 #include <kernel/cpu/intr.h>
 #include <kernel/cpu/gdt.h>
 #include <kernel/cpu/idt.h>
+#include <kernel/mem/phymem.h>
 
 #ifdef UNIT_TEST
 #include <kernel/test/unit_test.h>
@@ -15,6 +16,7 @@
 
 // Kernel entry is jumped to from boot loader after enabling 32-bit prot execution. At this time virtual memory paging is not enabled.
 void kmain() {
+    stack_init();
     gdt_init();
     idt_init();
     intr_init();
