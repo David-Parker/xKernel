@@ -147,7 +147,7 @@ void console_putc(char c)
     char* curr_line = (char*)ring_buffer_get_last(&video_ring);
 
     kassert(curr_line != NULL);
-    kassert(curr_line >= PHY_KERNEL_HEAP);
+    kassert((size_t)curr_line >= PHY_KERNEL_HEAP);
 
     int len = strlen(curr_line) / 2;
 
@@ -165,7 +165,7 @@ void console_putc(char c)
     if (c != '\n')
     {
         curr_line = (char*)ring_buffer_get_last(&video_ring);
-        kassert(curr_line >= PHY_KERNEL_HEAP);
+        kassert((size_t)curr_line >= PHY_KERNEL_HEAP);
 
         len = strlen(curr_line);
         curr_line[len] = c;
@@ -218,7 +218,7 @@ void console_scroll_n(int n)
 
             if (line != NULL)
             {
-                kassert(line >= PHY_KERNEL_HEAP); 
+                kassert((size_t)line >= PHY_KERNEL_HEAP);
                 video_ring_reader.idx_start = prev_start;
                 video_ring_reader.idx_end = prev_end;
             }
@@ -240,7 +240,7 @@ void console_scroll_n(int n)
 
             if (line != NULL)
             {
-                kassert(line >= PHY_KERNEL_HEAP); 
+                kassert((size_t)line >= PHY_KERNEL_HEAP);
                 video_ring_reader.idx_start = next_start;
                 video_ring_reader.idx_end = next_end;
             }

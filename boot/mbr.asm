@@ -7,18 +7,36 @@ LOADER_OFFSET equ 0x1000
 
 [org 0x7c00]
 SECTION .text
-    ; Load the real boot loader
-    mov bx, LOADER_OFFSET
-    mov ah, 0x02 ; read
-    mov al, 1
-    mov cl, 0x02 ; 0x02 is next sector after mbr
-    mov ch, 0x00 ; cylinder 0
-    mov dh, 0x00 ; head 0
+    mov [BOOT_DRIVE], dl
+    cli
+    mov ax,0
+    mov ds,ax
+    mov es,ax
+    mov ss,ax
+    mov sp,0xff00   ; Stack 0xff00 (256 byte stack) - grows downward.
+    sti
 
-    int 0x13
+    cld         ; Set the direction flag to be positive direction
+    
+    push MSG_START
+    call print_16
+    add sp, 2 ; arg pop (msg)
+
+    ; [es:bx] = address for loaded disk sector
+    mov bx, LOADER_OFFSET
+    push 2
+    push 1 ; Most sectors before we run into the stack
+    call load_disk
+    add sp, 4
+
     jmp LOADER_OFFSET
 
-BOOT_DRIVE db 0
+    %include "boot/print_16.asm"
+    %include "boot/disk.asm"
+    %include "boot/gdt.asm"
+
+    BOOT_DRIVE db 0
+    MSG_START: db "Starting MBR.",10,13,0
 
 ; padding and magic number
 times 510 - ($-$$) db 0
