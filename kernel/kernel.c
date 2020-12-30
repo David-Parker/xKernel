@@ -20,13 +20,14 @@ void kmain() {
     gdt_init();
     idt_init();
     intr_init();
+    timer_init();
     console_init();
     intr_enable();
 
     #ifdef UNIT_TEST
         test_driver();
     #else
-        //kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
+        kprintf("Welcome to xKernel! Type 'help' to get started.\n");
         //_u64 tsc_freq = get_tsc_freq();
 
         //kprintf("TSC Freq: %llu\n", tsc_freq);
@@ -58,5 +59,6 @@ void kmain() {
     #endif
 
     // Don't let eip loose through memory...
+    while(1);
     halt();
 }
