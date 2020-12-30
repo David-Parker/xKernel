@@ -56,8 +56,6 @@ void irq_handle_keyboard(registers_t* irq)
             return;
         }
 
-        //kprintf("%u\n", keycode);
-
         switch (keycode)
         {
             case KEY_PAGE_UP:

@@ -65,7 +65,7 @@ qemu-test: build-test qemu
 
 # Open the connection to qemu and load our kernel-object file with symbols
 debug: os-image.bin
-	qemu-system-i386 -s -S -fda ${BINDIR}/os-image.bin &
+	qemu-system-i386 -m 2g -s -S -fda ${BINDIR}/os-image.bin &
 	${GDB} -ex "target remote localhost:1234" -ex "symbol-file $(BINDIR)/kernel.elf"
 
 # Generic rules for wildcards

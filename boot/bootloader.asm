@@ -6,6 +6,7 @@ KERNEL_OFFSET equ 0x1200
 [org 0x1000]
 SECTION .text
     mov sp,0xff00   ; Stack 0xff00 (256 byte stack) - grows downward.
+    cld         ; Set the direction flag to be positive direction
     
     push MSG_START
     call print_16

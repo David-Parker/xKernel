@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kernel/util/stddef.h>
+#include <kernel/lib/ds.h>
 
 // Writes to a character frame buffer while booted in text mode
 // More on text mode: https://en.wikipedia.org/wiki/Text_mode
@@ -27,7 +28,7 @@
 
 #define VGA_MAX_ROWS 25
 #define VGA_MAX_COLS 80
-#define VIDEO_BUFFER_ROWS 4096
+#define VIDEO_BUFFER_ROWS 128
 
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
