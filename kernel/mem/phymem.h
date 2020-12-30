@@ -5,7 +5,7 @@
 #define PHY_KERNEL_CODE 0x1200
 #define PHY_VGA_MEM_START 0xb8000 // This address is memory-mapped to VGA controller's video memory while in text mode
 #define PHY_VGA_MEM_END 0xb8fa0
-#define PHY_KERNEL_HEAP 0x10000
+#define PHY_KERNEL_HEAP 0x10000000
 #define PHY_KERNEL_STACK 0x3fff0000
 #define PHY_KERNEL_MAX_MEM 0x40000000
 #define PHY_MAX_MEM 0xffffffff

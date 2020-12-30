@@ -28,7 +28,7 @@
 
 #define VGA_MAX_ROWS 25
 #define VGA_MAX_COLS 80
-#define VIDEO_BUFFER_ROWS 128
+#define VIDEO_BUFFER_ROWS 4096
 
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
