@@ -66,6 +66,7 @@ void console_init()
     vga_col_curr = 0;
     set_cursor_pos(0);
     console_clear();
+    console_simple_print(24, "xKernel v0.01");
 }
 
 void console_clear()
@@ -127,8 +128,6 @@ void render_screen()
 
         i = ring_buffer_next(&video_ring_reader, i);
     }
-
-    console_simple_print(24, "xKernel v0.01");
 
     set_cursor_pos(cur_idx);
 }
@@ -198,8 +197,6 @@ void console_set_colors(_u8 console, _u8 font)
 
 void console_scroll_n(int n)
 {
-    ring_buffer_copy(&video_ring, &video_ring_reader);
-
     if (n > 0)
     {
         for (int i = 0; i < n; ++i)

@@ -26,8 +26,7 @@ void kmain() {
     #ifdef UNIT_TEST
         test_driver();
     #else
-        kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
-    #endif
+        //kprintf("Hello %s, this is a test of printf! %d\n", "World", 42);
         //_u64 tsc_freq = get_tsc_freq();
 
         //kprintf("TSC Freq: %llu\n", tsc_freq);
@@ -56,6 +55,7 @@ void kmain() {
             //     last_second = curr;
             // }
         }
+    #endif
 
     // Don't let eip loose through memory...
     halt();
