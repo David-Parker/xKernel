@@ -5,4 +5,4 @@
 
 void* kmalloc(size_t bytes);
 void* kcalloc(size_t bytes);
-void free(_u8* addr);
+void free(void* addr);

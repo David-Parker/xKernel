@@ -42,6 +42,7 @@ void shell_handle_user_input(ring_buffer_t* user_input)
     }
 }
 
+// Parses a stream of keycodes (this is not neccessarily what is displayed on the screen currently)
 void shell_parse_user_input(ring_buffer_t* user_input)
 {
     char* input = (char*)kmalloc(user_input->buf_len + 1);

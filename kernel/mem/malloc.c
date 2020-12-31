@@ -38,7 +38,7 @@ void* kcalloc(size_t bytes)
     memset(mem, 0, bytes);
 }
 
-void free(_u8* addr)
+void free(void* addr)
 {
     kassert(addr != NULL);
 }

@@ -36,6 +36,7 @@ typedef struct ring_buffer
     size_t* buffer;
     int buf_len;
     int ring_len;
+    int size;
     int idx_start;
     int idx_end;
     int idx_read;
@@ -51,4 +52,5 @@ size_t ring_buffer_get_last(ring_buffer_t* ring);
 void ring_buffer_clear(ring_buffer_t* ring);
 int ring_buffer_next(ring_buffer_t* ring, int read_idx);
 int ring_buffer_prev(ring_buffer_t* ring, int read_idx);
+int ring_buffer_idx(ring_buffer_t* ring, int read_idx);
 int ring_buffer_distance(int start_idx, int end_idx, int buf_len);

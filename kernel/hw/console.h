@@ -32,6 +32,12 @@
 
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
+typedef struct console_line
+{
+    char str[(VGA_MAX_COLS * 2) + 1];
+    bool read_only;
+} console_line_t;
+
 typedef char* screen_ptr_t;
 _u8 vga_console_color;
 _u8 vga_font_color;
@@ -39,6 +45,7 @@ int vga_row_curr;
 int vga_col_curr;
 
 static void print_marquee();
+static void reset_reader();
 
 void console_init();
 void console_clear();

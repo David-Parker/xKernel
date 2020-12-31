@@ -87,6 +87,7 @@ void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring
     ring->buffer = buffer;
     ring->buf_len = buf_len;
     ring->ring_len = ring_len;
+    ring->size = 0;
     ring->idx_start = 0;
     ring->idx_end = 0;
     ring->idx_read = 0;
@@ -107,10 +108,10 @@ size_t ring_buffer_push(ring_buffer_t* ring, size_t elem)
     ring->buffer[ring->idx_end] = elem;
     ring->total_push++;
     ring->idx_end = modulo(ring->idx_end + 1, ring->buf_len);
+    ring->size++;
+    ring->size = min(ring->size, ring->buf_len);
 
-    int dist = ring_buffer_distance(ring->idx_start, ring->idx_end, ring->buf_len);
-
-    if (dist > ring->ring_len)
+    if (ring->size > ring->ring_len)
         ring->idx_start = modulo(ring->idx_start + 1, ring->buf_len);
     
     return old_elem;
@@ -120,8 +121,14 @@ size_t ring_buffer_pop(ring_buffer_t* ring)
 {
     kassert(ring != NULL);
     kassert(ring->idx_start != ring->idx_end);
+    kassert(ring->size > 0);
 
     size_t old_elem = ring->buffer[ring->idx_end];
+
+    ring->size--;
+
+    if (ring->size > ring->ring_len)
+        ring->idx_start = modulo(ring->idx_start - 1, ring->buf_len);
 
     int idx = modulo(ring->idx_end-1, ring->buf_len);
 
@@ -155,6 +162,7 @@ void ring_buffer_clear(ring_buffer_t* ring)
     ring->idx_end = 0;
     ring->idx_read = 0;
     ring->total_push = 0;
+    ring->size = 0;
 }
 
 int ring_buffer_next(ring_buffer_t* ring, int read_idx)
@@ -189,6 +197,11 @@ int ring_buffer_prev(ring_buffer_t* ring, int read_idx)
     {
         return read_idx;
     }
+}
+
+int ring_buffer_idx(ring_buffer_t* ring, int read_idx)
+{
+    return modulo(read_idx, ring->buf_len);
 }
 
 int ring_buffer_distance(int start_idx, int end_idx, int buf_len)
