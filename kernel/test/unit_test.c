@@ -1,4 +1,4 @@
-#ifdef UNIT_TEST 
+// #ifdef UNIT_TEST 
 #include <kernel/test/unit_test.h>
 #include <kernel/util/stddef.h>
 #include <kernel/util/debug.h>
@@ -814,33 +814,43 @@ void test_init()
 
 void test_driver()
 {
+    test_no = 0;
     test_init();
 
     int passed = 0;
 
     kprintf("Starting kernel unit tests...\n");
 
-    for (int i = 0; i < test_no; ++i)
+    int n_tests = test_no;
+
+    _u8 color_console = vga_console_color;
+    _u8 color_font = vga_font_color;
+
+    kprintf("%d %d\n", color_console, color_font);
+
+    halt();
+
+    for (int i = 0; i < n_tests; ++i)
     {
-        kprintf("[%d/%d] ", i+1, test_no+1);
+        kprintf("[%d/%d] ", i+1, n_tests);
         
         if (unit_tests[i].func() == true)
         {
             passed++;
             console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_GREEN);
             kprintf("PASSED ");
-            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
+            console_set_colors(color_console, color_font);
             kprintf("%s()\n", unit_tests[i].str);
         }
         else
         {
             console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_RED);
             kprintf("FAILED ");
-            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
+            console_set_colors(color_console, color_font);
             kprintf("%s()\n", unit_tests[i].str);
         }
     }
 
-    kprintf("%d out of %d tests passed.\n", passed, test_no);
+    kprintf("%d out of %d tests passed.\n", passed, n_tests);
 }
-#endif
+// #endif

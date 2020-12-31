@@ -33,10 +33,12 @@
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
 typedef char* screen_ptr_t;
-static _u8 vga_console_color;
-static _u8 vga_font_color;
+_u8 vga_console_color;
+_u8 vga_font_color;
 int vga_row_curr;
 int vga_col_curr;
+
+static void print_marquee();
 
 void console_init();
 void console_clear();

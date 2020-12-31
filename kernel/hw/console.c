@@ -26,6 +26,16 @@ int get_cursor_index(int row, int col)
     return row * VGA_MAX_COLS + col;
 }
 
+int get_cursor_row()
+{
+    return get_cursor_pos() / VGA_MAX_COLS;
+}
+
+int get_cursor_col()
+{
+    return get_cursor_pos() % VGA_MAX_COLS;
+}
+
 screen_ptr_t get_screen_addr(int row, int col)
 {
     return (screen_ptr_t) (PHY_VGA_MEM_START + (get_cursor_index(row, col))*2);
@@ -62,8 +72,6 @@ void console_init()
     ring_buffer_init(&video_ring, (size_t*)kcalloc(VIDEO_BUFFER_ROWS * sizeof(size_t)), VIDEO_BUFFER_ROWS, VGA_MAX_ROWS - 1);
     vga_console_color = VGA_COLOR_BLACK;
     vga_font_color = VGA_COLOR_WHITE;
-    vga_row_curr = 0;
-    vga_col_curr = 0;
     set_cursor_pos(0);
     console_clear();
 }
@@ -78,10 +86,10 @@ void console_clear()
         {
             screen = get_screen_addr(i, j);
             *(screen) = ' ';
+            *(screen+1) = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
         }
     }
 
-    // TODO: need to free memory
     ring_buffer_clear(&video_ring);
     set_cursor_pos(0);
     ring_buffer_copy(&video_ring, &video_ring_reader);
@@ -201,14 +209,18 @@ void console_popc()
     {
         free(curr_line);
         ring_buffer_pop(&video_ring);
-
-        console_popc();
+        int row = get_cursor_row();
+        set_cursor_pos(get_cursor_index(row-1, 0));
     }
     else
     {
+        int row = get_cursor_row();
+        int col = get_cursor_col();
+        set_cursor_pos(get_cursor_index(row, col-1));
         curr_line[len-2] = '\0';
-        ring_buffer_copy(&video_ring, &video_ring_reader);
     }
+
+    ring_buffer_copy(&video_ring, &video_ring_reader);
 }
 
 void console_simple_print(int row, char* str)
@@ -299,5 +311,5 @@ void console_scroll_down()
 
 void print_marquee()
 {
-    console_simple_print(24, "xKernel v0.01");
+    console_simple_print(24, "xKernel v0.01                                                                   ");
 }

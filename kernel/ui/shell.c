@@ -3,6 +3,9 @@
 #include <kernel/hw/keyboard.h>
 #include <kernel/hw/console.h>
 #include <kernel/lib/iolib.h>
+#include <kernel/mem/malloc.h>
+#include <kernel/test/unit_test.h>
+#include <kernel/util/debug.h>
 
 void shell_handle_user_input(ring_buffer_t* user_input)
 {
@@ -23,6 +26,7 @@ void shell_handle_user_input(ring_buffer_t* user_input)
             console_flush();
             break;
         case KEY_ENTER:
+            console_putc('\n');
             shell_parse_user_input(user_input);
             break;
         case KEY_PAGE_UP:
@@ -40,21 +44,24 @@ void shell_handle_user_input(ring_buffer_t* user_input)
 
 void shell_parse_user_input(ring_buffer_t* user_input)
 {
-    console_putc('\n');
-
-    char input[512 + 1];
+    char* input = (char*)kmalloc(user_input->buf_len + 1);
     int input_i = 0;
     int read_idx = user_input->idx_start;
 
     while (read_idx != -1)
     {
+        kassert(input_i >= 0);
+        kassert(input_i < (user_input->buf_len + 1));
+
         size_t keycode = ring_buffer_get(user_input, read_idx);
         read_idx = ring_buffer_next(user_input, read_idx);
 
         // skip over next char
         if (keycode == KEY_BACKSPACE)
         {
-            input[input_i--] = '\0';
+            if (input_i > 0)
+                input[input_i--] = '\0';
+
             continue;
         }
 
@@ -75,8 +82,6 @@ void shell_parse_user_input(ring_buffer_t* user_input)
 
 void shell_handle_command(char* cmd)
 {
-    //kprintf("cmd: %s\n", cmd);
-
     int arg1, arg2;
 
     if (strcmp(cmd, "help"))
@@ -93,18 +98,31 @@ void shell_handle_command(char* cmd)
     }
     else if (sscanf(cmd, "clr %d %d", &arg1, &arg2) == 2)
     {
-        // kprintf("%d %d\n", arg1, arg2);
+        if ((arg1 == 0 && arg2 == 0) || 
+            (arg1 < 0 || arg1 > 15 ||
+            (arg2 < 0 || arg2 > 15)))
+        {
+            kprintf("Invalid color codes.\n");
+            return;
+        }
+
         console_set_colors(arg1, arg2);
+    }
+    else if (strcmp(cmd, "test"))
+    {
+        test_driver();
     }
 }
 
 void shell_print_help()
 {
+    kprintf("To scroll the console, use pg up and pg down keys.\n");
     kprintf("List of available commands:\n");
-    kprintf("    help           - prints this message.\n");
-    kprintf("    cls            - clears the entire screen.\n");
-    kprintf("    clr [bg] [fg]  - Changes the console colors.\n");
-    kprintf("    sig            - prints the xKernel signature.\n");
+    kprintf("    help           - Prints this message.\n");
+    kprintf("    cls            - Clears the entire screen.\n");
+    kprintf("    clr [bg] [fg]  - Changes the console colors. Color codes: 0 to 15.\n");
+    kprintf("    sig            - Prints the xKernel signature.\n");
+    kprintf("    test           - Run kernel unit tests.\n");
 }
 
 void shell_print_sig()
