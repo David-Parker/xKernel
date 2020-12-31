@@ -30,10 +30,10 @@ void shell_handle_user_input(ring_buffer_t* user_input)
             shell_parse_user_input(user_input);
             break;
         case KEY_PAGE_UP:
-            console_scroll_n(VGA_MAX_ROWS);
+            console_scroll_n(VIDEO_RING_WINDOW_SIZE);
             break;
         case KEY_PAGE_DOWN:
-            console_scroll_n(-VGA_MAX_ROWS);
+            console_scroll_n(-(VIDEO_RING_WINDOW_SIZE));
             break;
         default:
             console_putc(keyboard_map[key]);

@@ -30,6 +30,8 @@
 #define VGA_MAX_COLS 80
 #define VIDEO_BUFFER_ROWS 4096
 
+#define VIDEO_RING_WINDOW_SIZE (VGA_MAX_ROWS - 1)
+
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
 typedef struct console_line

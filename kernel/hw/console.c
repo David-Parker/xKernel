@@ -69,7 +69,7 @@ void set_cursor_pos(int index)
 
 void console_init()
 {
-    ring_buffer_init(&video_ring, (size_t*)kcalloc(VIDEO_BUFFER_ROWS * sizeof(size_t)), VIDEO_BUFFER_ROWS, VGA_MAX_ROWS - 1);
+    ring_buffer_init(&video_ring, (size_t*)kcalloc(VIDEO_BUFFER_ROWS * sizeof(size_t)), VIDEO_BUFFER_ROWS, VIDEO_RING_WINDOW_SIZE);
     vga_console_color = VGA_COLOR_BLACK;
     vga_font_color = VGA_COLOR_WHITE;
     set_cursor_pos(0);
@@ -273,9 +273,9 @@ void console_scroll_n(int n)
         for (int i = 0; i < n; ++i)
         {
             int distance = ring_buffer_distance(
-            video_ring_reader.idx_start, 
-            video_ring.idx_start, 
-            video_ring.buf_len);
+                video_ring_reader.idx_start, 
+                video_ring.idx_start, 
+                video_ring.buf_len);
 
             if (distance >= (VIDEO_BUFFER_ROWS - VGA_MAX_ROWS))
             {
