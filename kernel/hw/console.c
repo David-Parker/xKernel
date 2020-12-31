@@ -211,7 +211,7 @@ void console_popc()
     }
     
     console_line_t* curr_line = (console_line_t*)ring_buffer_get_last(&video_ring);
-    console_line_t* line_above = ring_buffer_get(&video_ring, video_ring.idx_end - 2);
+    console_line_t* line_above = (console_line_t*)ring_buffer_get(&video_ring, video_ring.idx_end - 2);
 
     if (curr_line->read_only)
     {
