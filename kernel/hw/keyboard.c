@@ -58,7 +58,9 @@ bool keyboard_is_printable(int keycode)
         (keycode >= KEY_1 && keycode <= KEY_0) ||
         (keycode >= KEY_Q && keycode <= KEY_RIGHT_BRACK) ||
         (keycode >= KEY_a && keycode <= KEY_APOS) ||
-        (keycode >= KEY_z && keycode <= KEY_SLASH);
+        (keycode >= KEY_z && keycode <= KEY_SLASH) ||
+        (keycode == KEY_SPACE)
+        ;
 }
 
 void irq_handle_keyboard(registers_t* irq)

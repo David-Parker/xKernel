@@ -335,6 +335,56 @@ bool kprintf_mixed()
     TestString(expected, "%% %d is %s %x %llu %%", 123, "foo", 16, 12345ull);
     return true;
 }
+bool sscanf_none()
+{
+    char* str = "bar";
+    int res = 0;
+
+    int scanned = sscanf(str, "foo %d", &res);
+
+    tassert(scanned == 0);
+    tassert(res == 0);
+
+    return true;
+}
+bool sscanf_int_zero()
+{
+    char* str = "foo";
+    int res = 0;
+
+    int scanned = sscanf(str, "foo %d", &res);
+
+    tassert(scanned == 0);
+    tassert(res == 0);
+
+    return true;
+}
+bool sscanf_int_one()
+{
+    char* str = "foo 42";
+    int res = 0;
+
+    int scanned = sscanf(str, "foo %d", &res);
+
+    tassert(scanned == 1);
+    tassert(res == 42);
+
+    return true;
+}
+bool sscanf_int_two()
+{
+    char* str = "foo 42 69";
+    int res1 = 0;
+    int res2 = 0;
+
+    int scanned = sscanf(str, "foo %d %d", &res1, &res2);
+
+    tassert(scanned == 2);
+    tassert(res1 == 42);
+    tassert(res2 == 69);
+
+    return true;
+}
 #pragma GCC diagnostic pop
 #pragma endregion iolib
 #pragma region linked_list
@@ -741,6 +791,10 @@ void test_init()
     TEST_FUNC(kprintf_hex);
     TEST_FUNC(kprintf_hex_max);
     TEST_FUNC(kprintf_mixed);
+    TEST_FUNC(sscanf_none);
+    TEST_FUNC(sscanf_int_zero);
+    TEST_FUNC(sscanf_int_one);
+    TEST_FUNC(sscanf_int_two);
     TEST_FUNC(linkedlist_empty);
     TEST_FUNC(linkedlist_add_one);
     TEST_FUNC(linkedlist_add_multi);

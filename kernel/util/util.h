@@ -7,8 +7,6 @@
 
 void * memcpy (void * destination, const void * source, size_t num );
 void * memset (void * ptr, int value, size_t num );
-bool strcmp(char* lhs, char* rhs);
-int strlen(char* str);
 void halt();
 int min(int lhs, int rhs);
 int max(int lhs, int rhs);

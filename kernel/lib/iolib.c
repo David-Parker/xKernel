@@ -276,3 +276,82 @@ void vkprintf(const char *fmt, char* buffer, int buf_len, va_list args)
         buffer[strLen] = '\0';
     }
 }
+
+bool strcmp(char* lhs, char* rhs)
+{
+    if (lhs == NULL || rhs == NULL)
+    {
+        return lhs == rhs;
+    }
+
+    while (*lhs != '\0')
+    {
+        char c = *lhs++;
+        char o = *rhs++;
+
+        if (o == '\0')
+        {
+            return false;
+        }
+        if (c != o)
+        {
+            return false;
+        }
+    }
+
+    return *rhs == '\0';
+}
+
+int strlen(char* str)
+{
+    int len = 0;
+
+    while (*str != '\0')
+    {
+        len++;
+        str++;
+    }
+
+    return len;
+}
+
+int sscanf(const char *str, const char *format, ...)
+{
+	const char *start = str;
+	va_list args;
+
+    int scanned = 0;
+	
+	va_start(args, format);
+	for ( ; *format != '\0'; format++) {
+		if (*format == '%' && format[1] == 'd') {
+			int positive;
+			int value;
+			int *valp;
+			
+			if (*str == '-') {
+				positive = 0;
+				str++;
+			} else
+				positive = 1;
+			if (!isdigit(*str))
+				break;
+			value = 0;
+			do {
+				value = (value * 10) - (*str - '0');
+				str++;
+			} while (isdigit(*str));
+			if (positive)
+				value = -value;
+			valp = va_arg(args, int *);
+			*valp = value;
+            scanned++;
+			format++;
+		} else if (*format == *str) {
+			str++;
+		} else
+			break;
+	}
+	va_end(args);
+	return scanned;
+}

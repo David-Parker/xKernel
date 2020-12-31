@@ -85,7 +85,7 @@ void console_clear()
     ring_buffer_clear(&video_ring);
     set_cursor_pos(0);
     ring_buffer_copy(&video_ring, &video_ring_reader);
-    console_simple_print(24, "xKernel v0.01");
+    print_marquee();
 }
 
 void console_flush()
@@ -229,6 +229,7 @@ void console_set_colors(_u8 console, _u8 font)
 {
     vga_console_color = console;
     vga_font_color = font;
+    print_marquee();
 }
 
 void console_scroll_n(int n)
@@ -294,4 +295,9 @@ void console_scroll_up()
 void console_scroll_down()
 {
     console_scroll_n(-1);
+}
+
+void print_marquee()
+{
+    console_simple_print(24, "xKernel v0.01");
 }

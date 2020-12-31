@@ -51,6 +51,13 @@ void shell_parse_user_input(ring_buffer_t* user_input)
         size_t keycode = ring_buffer_get(user_input, read_idx);
         read_idx = ring_buffer_next(user_input, read_idx);
 
+        // skip over next char
+        if (keycode == KEY_BACKSPACE)
+        {
+            input[input_i--] = '\0';
+            continue;
+        }
+
         if (!keyboard_is_printable(keycode))
         {
             continue;
@@ -70,18 +77,34 @@ void shell_handle_command(char* cmd)
 {
     //kprintf("cmd: %s\n", cmd);
 
+    int arg1, arg2;
+
     if (strcmp(cmd, "help"))
     {
-
+        shell_print_help();
     }
     else if (strcmp(cmd, "cls"))
     {
         console_clear();
     }
-        else if (strcmp(cmd, "sig"))
+    else if (strcmp(cmd, "sig"))
     {
         shell_print_sig();
     }
+    else if (sscanf(cmd, "clr %d %d", &arg1, &arg2) == 2)
+    {
+        // kprintf("%d %d\n", arg1, arg2);
+        console_set_colors(arg1, arg2);
+    }
+}
+
+void shell_print_help()
+{
+    kprintf("List of available commands:\n");
+    kprintf("    help           - prints this message.\n");
+    kprintf("    cls            - clears the entire screen.\n");
+    kprintf("    clr [bg] [fg]  - Changes the console colors.\n");
+    kprintf("    sig            - prints the xKernel signature.\n");
 }
 
 void shell_print_sig()

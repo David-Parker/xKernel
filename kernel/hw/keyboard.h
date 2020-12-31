@@ -19,6 +19,7 @@
 #define KEY_PAGE_DOWN 81
 #define KEY_ENTER 28
 #define KEY_BACKSPACE 14
+#define KEY_SPACE 57
 #define KEY_LEFT_SHIFT 42
 #define KEY_RIGHT_SHIFT 54
 #define KEY_CTRL 29
