@@ -268,53 +268,33 @@ void console_set_colors(_u8 console, _u8 font)
 
 void console_scroll_n(int n)
 {
+    int s_idx = video_ring_reader.idx_start;
+    int e_idx = video_ring_reader.idx_end;
+    int max_up = video_ring.size - video_ring.ring_len - video_ring_reader.idx_read;
+    int max_down = video_ring_reader.idx_read;
+
     if (n > 0)
     {
-        for (int i = 0; i < n; ++i)
+        int moves = min(n, max_up);
+
+        if (moves > 0)
         {
-            int distance = ring_buffer_distance(
-                video_ring_reader.idx_start, 
-                video_ring.idx_start, 
-                video_ring.buf_len);
-
-            if (distance >= (VIDEO_BUFFER_ROWS - VGA_MAX_ROWS))
-            {
-                break;
-            }
-
-            int prev_start = ring_buffer_prev(&video_ring_reader, video_ring_reader.idx_start);
-            int prev_end = ring_buffer_prev(&video_ring_reader, video_ring_reader.idx_end);
-
-            console_line_t* line = (console_line_t*)ring_buffer_get(&video_ring_reader, prev_start);
-
-            if (line != NULL)
-            {
-                kassert((size_t)line >= PHY_KERNEL_HEAP);
-                video_ring_reader.idx_start = prev_start;
-                video_ring_reader.idx_end = prev_end;
-            }
+            video_ring_reader.idx_start = ring_buffer_idx(&video_ring, video_ring_reader.idx_start - moves);
+            video_ring_reader.idx_end = ring_buffer_idx(&video_ring, video_ring_reader.idx_end - moves);
+            video_ring_reader.idx_read += moves;
         }
     }
     else if (n < 0)
     {
-        for (int i = n; i < 0; ++i)
+        n = -n;
+
+        int moves = min(n, max_down);
+
+        if (moves > 0)
         {
-            if (video_ring_reader.idx_start >= video_ring.idx_start)
-            {
-                break;
-            }
-
-            int next_start = ring_buffer_next(&video_ring_reader, video_ring_reader.idx_start);
-            int next_end = ring_buffer_next(&video_ring_reader, video_ring_reader.idx_end);
-
-            console_line_t* line = (console_line_t*)ring_buffer_get(&video_ring_reader, next_start);
-
-            if (line != NULL)
-            {
-                kassert((size_t)line >= PHY_KERNEL_HEAP);
-                video_ring_reader.idx_start = next_start;
-                video_ring_reader.idx_end = next_end;
-            }
+            video_ring_reader.idx_start = ring_buffer_idx(&video_ring, video_ring_reader.idx_start + moves);
+            video_ring_reader.idx_end = ring_buffer_idx(&video_ring, video_ring_reader.idx_end + moves);
+            video_ring_reader.idx_read -= moves;
         }
     }
 
