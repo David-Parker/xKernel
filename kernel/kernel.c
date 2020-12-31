@@ -1,14 +1,15 @@
-#include <kernel/lib/iolib.h>
-#include <kernel/util/util.h>
+#include <kernel/cpu/intr.h>
+#include <kernel/cpu/gdt.h>
+#include <kernel/cpu/idt.h>
 #include <kernel/hw/console.h>
 #include <kernel/hw/keyboard.h>
 #include <kernel/hw/timer.h>
 #include <kernel/hw/tsc.h>
 #include <kernel/hw/msr.h>
-#include <kernel/cpu/intr.h>
-#include <kernel/cpu/gdt.h>
-#include <kernel/cpu/idt.h>
+#include <kernel/lib/iolib.h>
 #include <kernel/mem/phymem.h>
+#include <kernel/ui/shell.h>
+#include <kernel/util/util.h>
 
 #ifdef UNIT_TEST
 #include <kernel/test/unit_test.h>
@@ -21,12 +22,14 @@ void kmain() {
     idt_init();
     intr_init();
     timer_init();
+    keyboard_init();
     console_init();
     intr_enable();
 
     #ifdef UNIT_TEST
         test_driver();
-    #else
+    #endif
+        shell_print_sig();
         kprintf("Welcome to xKernel! Type 'help' to get started.\n");
         //_u64 tsc_freq = get_tsc_freq();
 
@@ -34,6 +37,7 @@ void kmain() {
 
         while (true)
         {
+            shell_handle_user_input(&user_input);
             // if (timer_ticks % 18 == 0)
             // {
             //     kprintf("Ticks: %llu\n", timer_ticks);
@@ -56,7 +60,6 @@ void kmain() {
             //     last_second = curr;
             // }
         }
-    #endif
 
     // Don't let eip loose through memory...
     while(1);

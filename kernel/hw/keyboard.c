@@ -1,6 +1,8 @@
 #include <kernel/hw/keyboard.h>
 #include <kernel/lib/iolib.h>
+#include <kernel/hw/ioports.h>
 #include <kernel/hw/console.h>
+#include <kernel/ui/shell.h>
 
 char keyboard_map[128] =
 {
@@ -42,6 +44,23 @@ char keyboard_map[128] =
     0,	/* All other keys are undefined */
 };
 
+size_t key_buffer[512];
+ring_buffer_t user_input;
+
+void keyboard_init()
+{
+    ring_buffer_init(&user_input, key_buffer, ARRSIZE(key_buffer), ARRSIZE(key_buffer));
+}
+
+bool keyboard_is_printable(int keycode)
+{
+    return
+        (keycode >= KEY_1 && keycode <= KEY_0) ||
+        (keycode >= KEY_Q && keycode <= KEY_RIGHT_BRACK) ||
+        (keycode >= KEY_a && keycode <= KEY_APOS) ||
+        (keycode >= KEY_z && keycode <= KEY_SLASH);
+}
+
 void irq_handle_keyboard(registers_t* irq)
 {
     _u8 status = read_port_byte(PORT_KEYBOARD_REG_CTRL);
@@ -56,18 +75,8 @@ void irq_handle_keyboard(registers_t* irq)
             return;
         }
 
-        switch (keycode)
-        {
-            case KEY_PAGE_UP:
-                console_scroll_n(VGA_MAX_ROWS);
-                break;
-            case KEY_PAGE_DOWN:
-                console_scroll_n(-VGA_MAX_ROWS);
-                break;
-            default:
-                console_putc(keyboard_map[keycode]);
-                console_flush();
-                break;
-        }
+        //kprintf("%d\n", keycode);
+
+        ring_buffer_push(&user_input, keycode);
     }
 }

@@ -66,7 +66,6 @@ void console_init()
     vga_col_curr = 0;
     set_cursor_pos(0);
     console_clear();
-    console_simple_print(24, "xKernel v0.01");
 }
 
 void console_clear()
@@ -81,6 +80,12 @@ void console_clear()
             *(screen) = ' ';
         }
     }
+
+    // TODO: need to free memory
+    ring_buffer_clear(&video_ring);
+    set_cursor_pos(0);
+    ring_buffer_copy(&video_ring, &video_ring_reader);
+    console_simple_print(24, "xKernel v0.01");
 }
 
 void console_flush()
@@ -90,7 +95,10 @@ void console_flush()
 
 void render_screen()
 {
-    kassert(video_ring_reader.idx_start != video_ring_reader.idx_end);
+    if (video_ring.idx_start == video_ring.idx_end)
+    {
+        return;
+    }
 
     screen_ptr_t video_memory;
     int i = video_ring_reader.idx_start;
@@ -134,7 +142,7 @@ void render_screen()
 
 void console_putc(char c)
 {
-    if (video_ring.total_push == 0)
+    if (video_ring.idx_start == video_ring.idx_end)
     {
         char* line = (char*)kcalloc((VGA_MAX_COLS*2) + 1);
         kassert((size_t)line >= PHY_KERNEL_HEAP);
@@ -173,6 +181,34 @@ void console_putc(char c)
     }
 
     ring_buffer_copy(&video_ring, &video_ring_reader);
+}
+
+void console_popc()
+{
+    if (video_ring.idx_start == video_ring.idx_end)
+    {
+        return;
+    }
+    
+    char* curr_line = (char*)ring_buffer_get_last(&video_ring);
+
+    kassert(curr_line != NULL);
+    kassert((size_t)curr_line >= PHY_KERNEL_HEAP);
+
+    int len = strlen(curr_line);
+
+    if (len == 0)
+    {
+        free(curr_line);
+        ring_buffer_pop(&video_ring);
+
+        console_popc();
+    }
+    else
+    {
+        curr_line[len-2] = '\0';
+        ring_buffer_copy(&video_ring, &video_ring_reader);
+    }
 }
 
 void console_simple_print(int row, char* str)

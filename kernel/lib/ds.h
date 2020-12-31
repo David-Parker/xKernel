@@ -38,12 +38,14 @@ typedef struct ring_buffer
     int ring_len;
     int idx_start;
     int idx_end;
+    int idx_read;
     _u64 total_push;
 } ring_buffer_t, *ring_buffer_ptr_t;
 
 void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring_len);
 void ring_buffer_copy(ring_buffer_t* from, ring_buffer_t* to);
 size_t ring_buffer_push(ring_buffer_t* ring, size_t elem);
+size_t ring_buffer_pop(ring_buffer_t* ring);
 size_t ring_buffer_get(ring_buffer_t* ring, int idx);
 size_t ring_buffer_get_last(ring_buffer_t* ring);
 void ring_buffer_clear(ring_buffer_t* ring);

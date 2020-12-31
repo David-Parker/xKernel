@@ -42,6 +42,7 @@ void console_init();
 void console_clear();
 void console_flush();
 void console_putc(char c);
+void console_popc();
 void console_simple_print(int row, char* str);
 void console_set_colors(_u8 console, _u8 font);
 void console_scroll_n(int n);
