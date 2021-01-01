@@ -6,9 +6,9 @@ OBJ = ${ASM_SOURCES:.s=.o} ${C_SOURCES:.c=.o}
 BINDIR = ./bin/x86
 
 # Change this if your cross-compiler is somewhere else
-CC = /usr/local/i386elfgcc/bin/i386-elf-gcc
+CC = /usr/local/i686elfgcc/bin/i686-elf-gcc
 GDB = gdb
-LD = /usr/local/i386elfgcc/bin/i386-elf-ld
+LD = /usr/local/i686elfgcc/bin/i686-elf-ld
 INC=-I./
 # -g: Use debugging symbols in gcc
 CFLAGS = -g -std=c99
@@ -25,12 +25,14 @@ os-image.bin: boot/mbr.bin boot/bootloader.bin kernel.bin kernel.elf
 	cat ${BINDIR}/mbr.bin ${BINDIR}/bootloader.bin ${BINDIR}/kernel.bin > ${BINDIR}/os-image.bin
 	truncate -s 64K ${BINDIR}/os-image.bin
 
+# Installs tool dependencies then builds a cross compiler for i686 32-bit architecture
 packages:
-	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin bcc
+	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin nasm libgmp3-dev libmpfr-dev libmpc-dev texinfo gcc 
+	sudo sh ./install.sh
 
 virt: iso
-	sudo qemu-system-i386 -m 2g -enable-kvm -cpu host,+tsc,+msr,+invtsc -cdrom ${BINDIR}/iso/xkernel.iso
-	#sudo qemu-system-i386 -enable-kvm -cpu max -cdrom ${BINDIR}/iso/myos.iso
+	sudo qemu-system-x86_64 -m 2g -enable-kvm -cpu host,+tsc,+msr,+invtsc -cdrom ${BINDIR}/iso/xkernel.iso
+	#sudo qemu-system-x86_64 -enable-kvm -cpu max -cdrom ${BINDIR}/iso/myos.iso
 	#-drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
 
 iso: os-image.bin
@@ -42,14 +44,14 @@ iso: os-image.bin
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o ${OBJ}
-	${LD} -o ${BINDIR}/$@ -Ttext 0x1200 $^ --oformat binary -L/usr/local/i386elfgcc/lib/gcc/i386-elf/4.9.1 -lgcc
+	${LD} -o ${BINDIR}/$@ -Ttext 0x1200 $^ --oformat binary -L/usr/local/i686elfgcc/lib/gcc/i686-elf/9.3.0 -lgcc
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${OBJ}
-	${LD} -o ${BINDIR}/$@ -Ttext 0x1200 $^ -L/usr/local/i386elfgcc/lib/gcc/i386-elf/4.9.1 -lgcc
+	${LD} -o ${BINDIR}/$@ -Ttext 0x1200 $^ -L/usr/local/i686elfgcc/lib/gcc/i686-elf/9.3.0 -lgcc
 
 run: os-image.bin
-	qemu-system-i386 -m 2g -drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
+	qemu-system-x86_64 -m 2g -drive file=${BINDIR}/os-image.bin,index=0,media=disk,format=raw
 
 build-test:
 	$(eval override CFLAGS += -D=UNIT_TEST)
@@ -59,13 +61,13 @@ test: build-test run
 test-debug: build-test debug
 
 qemu: os-image.bin
-	qemu-system-i386 -s -S -m 2g -fda ${BINDIR}/os-image.bin
+	qemu-system-x86_64 -s -S -m 2g -fda ${BINDIR}/os-image.bin
 
 qemu-test: build-test qemu
 
-# Open the connection to qemu and load our kernel-object file with symbols
+# Open the connection to qemu-system-x86_64 and load our kernel-object file with symbols
 debug: os-image.bin
-	qemu-system-i386 -m 2g -s -S -fda ${BINDIR}/os-image.bin &
+	qemu-system-x86_64 -m 2g -s -S -fda ${BINDIR}/os-image.bin &
 	${GDB} -ex "target remote localhost:1234" -ex "symbol-file $(BINDIR)/kernel.elf"
 
 # Generic rules for wildcards

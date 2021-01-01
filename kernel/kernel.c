@@ -25,6 +25,7 @@ void kmain() {
     keyboard_init();
     console_init();
     intr_enable();
+   // get_tsc_freq();
 
     #ifdef UNIT_TEST
         test_driver();
