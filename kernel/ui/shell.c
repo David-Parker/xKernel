@@ -79,6 +79,7 @@ void shell_parse_user_input(ring_buffer_t* user_input)
 
     ring_buffer_clear(user_input);
     shell_handle_command(input);
+    free(input);
 }
 
 void shell_handle_command(char* cmd)
