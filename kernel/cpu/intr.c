@@ -1,11 +1,11 @@
-#include <kernel/cpu/intr.h>
-#include <kernel/cpu/idt.h>
-#include <kernel/cpu/gdt.h>
-#include <kernel/lib/iolib.h>
-#include <kernel/util/debug.h>
-#include <kernel/hw/ioports.h>
-#include <kernel/hw/keyboard.h>
-#include <kernel/hw/timer.h>
+#include <intr.h>
+#include <idt.h>
+#include <gdt.h>
+#include <iolib.h>
+#include <debug.h>
+#include <ioports.h>
+#include <keyboard.h>
+#include <timer.h>
 
 const char* intr_strings[] = 
 {

@@ -1,6 +1,6 @@
-#include <kernel/hw/msr.h>
-#include <kernel/hw/cpuid.h>
-#include <kernel/lib/iolib.h>
+#include <msr.h>
+#include <cpuid.h>
+#include <iolib.h>
 
 bool msr_supported() {
     _u32 a = 0;

@@ -1,7 +1,7 @@
-#include <kernel/cpu/idt.h>
-#include <kernel/util/util.h>
-#include <kernel/cpu/intr.h>
-#include <kernel/hw/ioports.h>
+#include <idt.h>
+#include <util.h>
+#include <intr.h>
+#include <ioports.h>
 
 void idt_init()
 {

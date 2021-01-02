@@ -1,5 +1,5 @@
-#include <kernel/cpu/gdt.h>
-#include <kernel/mem/phymem.h>
+#include <gdt.h>
+#include <phymem.h>
 
 void gdt_init()
 {

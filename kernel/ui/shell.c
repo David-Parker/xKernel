@@ -1,11 +1,12 @@
-#include <kernel/ui/shell.h>
-#include <kernel/util/util.h>
-#include <kernel/hw/keyboard.h>
-#include <kernel/hw/console.h>
-#include <kernel/lib/iolib.h>
-#include <kernel/mem/malloc.h>
-#include <kernel/test/unit_test.h>
-#include <kernel/util/debug.h>
+#include <shell.h>
+#include <util.h>
+#include <keyboard.h>
+#include <console.h>
+#include <iolib.h>
+#include <malloc.h>
+#include <test/unit_test.h>
+#include <debug.h>
+#include <string.h>
 
 void shell_handle_user_input(ring_buffer_t* user_input)
 {

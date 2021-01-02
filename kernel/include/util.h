@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
+#include <stddef.h>
 
 #define align_4(addr) ((size_t)addr & 0x3)
 #define align_8(addr) ((size_t)addr & 0x7)

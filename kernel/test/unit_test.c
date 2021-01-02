@@ -1,12 +1,13 @@
 // #ifdef UNIT_TEST 
-#include <kernel/test/unit_test.h>
-#include <kernel/util/stddef.h>
-#include <kernel/util/debug.h>
-#include <kernel/util/util.h>
-#include <kernel/lib/iolib.h>
-#include <kernel/lib/ds.h>
-#include <kernel/hw/console.h>
-#include <kernel/mem/malloc.h>
+#include <test/unit_test.h>
+#include <stddef.h>
+#include <debug.h>
+#include <util.h>
+#include <iolib.h>
+#include <ds.h>
+#include <console.h>
+#include <malloc.h>
+#include <string.h>
 
 #pragma region strcmp
 

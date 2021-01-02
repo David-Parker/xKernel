@@ -1,5 +1,5 @@
-#include <kernel/hw/timer.h>
-#include <kernel/hw/ioports.h>
+#include <timer.h>
+#include <ioports.h>
 
 _u64 timer_ticks = 0;
 

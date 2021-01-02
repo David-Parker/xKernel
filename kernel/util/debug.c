@@ -1,5 +1,5 @@
-#include <kernel/util/debug.h>
-#include <kernel/hw/console.h>
+#include <debug.h>
+#include <console.h>
 
 void kpanic(char* message)
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
+#include <stddef.h>
 
 // Data Structures
 

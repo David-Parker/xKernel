@@ -1,5 +1,6 @@
-#include <kernel/lib/iolib.h>
-#include <kernel/hw/console.h>
+#include <iolib.h>
+#include <console.h>
+#include <string.h>
 
 const char charMapLower[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 const char charMapUpper[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -275,44 +276,6 @@ void vkprintf(const char *fmt, char* buffer, int buf_len, va_list args)
     {
         buffer[strLen] = '\0';
     }
-}
-
-bool strcmp(char* lhs, char* rhs)
-{
-    if (lhs == NULL || rhs == NULL)
-    {
-        return lhs == rhs;
-    }
-
-    while (*lhs != '\0')
-    {
-        char c = *lhs++;
-        char o = *rhs++;
-
-        if (o == '\0')
-        {
-            return false;
-        }
-        if (c != o)
-        {
-            return false;
-        }
-    }
-
-    return *rhs == '\0';
-}
-
-int strlen(char* str)
-{
-    int len = 0;
-
-    while (*str != '\0')
-    {
-        len++;
-        str++;
-    }
-
-    return len;
 }
 
 int sscanf(const char *str, const char *format, ...)

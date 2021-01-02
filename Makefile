@@ -1,6 +1,5 @@
 C_SOURCES = $(wildcard kernel/*.c) $(wildcard kernel/**/*.c)
 ASM_SOURCES = $(wildcard kernel/*.s) $(wildcard kernel/**/*.s)
-HEADERS = $(wildcard kernel/*.h) $(wildcard kernel/**/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${ASM_SOURCES:.s=.o} ${C_SOURCES:.c=.o}
 BINDIR = ./bin/x86
@@ -9,7 +8,7 @@ BINDIR = ./bin/x86
 CC = /usr/local/i686elfgcc/bin/i686-elf-gcc
 GDB = gdb
 LD = /usr/local/i686elfgcc/bin/i686-elf-ld
-INC=-I./
+INC=-I./kernel/include
 # -g: Use debugging symbols in gcc
 CFLAGS = -g -std=c99
 
@@ -72,10 +71,10 @@ debug: os-image.bin
 
 # Generic rules for wildcards
 # To make an object, always compile from its .c
-%.o: %.c ${HEADERS}
+%.o: %.c
 	${CC} ${CFLAGS} ${INC} -ffreestanding -c $< -o $@
 
-%.o: %.s ${HEADERS}
+%.o: %.s
 	nasm $< -f elf -o $@
 
 %.o: %.asm
@@ -88,4 +87,5 @@ clean:
 	find . -type f -name "*.o" -delete
 	find . -type f -name "*.bin" -delete
 	find . -type f -name "*.img" -delete
+	find . -type f -name "*.elf" -delete
 	rm -rf bin

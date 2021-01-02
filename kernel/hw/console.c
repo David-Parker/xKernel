@@ -1,9 +1,10 @@
-#include <kernel/hw/console.h>
-#include <kernel/hw/ioports.h>
-#include <kernel/mem/phymem.h>
-#include <kernel/mem/malloc.h>
-#include <kernel/util/util.h>
-#include <kernel/util/debug.h>
+#include <console.h>
+#include <ioports.h>
+#include <phymem.h>
+#include <malloc.h>
+#include <util.h>
+#include <debug.h>
+#include <string.h>
 
 int get_cursor_index(int row, int col);
 screen_ptr_t get_screen_addr(int row, int col);

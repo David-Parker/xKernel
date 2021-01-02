@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
+#include <stddef.h>
 
 void call_cpuid(
     _u32 cpuid,

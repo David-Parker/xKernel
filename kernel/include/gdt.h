@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
+#include <stddef.h>
 
 // Global Descriptor Table
 // More about GDT http://www.jamesmolloy.co.uk/tutorial_html/4.-The%20GDT%20and%20IDT.html

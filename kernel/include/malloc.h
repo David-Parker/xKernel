@@ -1,7 +1,7 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
-#include <kernel/util/util.h>
+#include <stddef.h>
+#include <util.h>
 
 void* kmalloc(size_t bytes);
 void* kcalloc(size_t bytes);

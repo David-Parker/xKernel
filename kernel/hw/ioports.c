@@ -1,4 +1,4 @@
-#include <kernel/hw/ioports.h>
+#include <ioports.h>
 
 unsigned char read_port_byte (unsigned short port)
 {

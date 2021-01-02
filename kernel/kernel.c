@@ -1,18 +1,18 @@
-#include <kernel/cpu/intr.h>
-#include <kernel/cpu/gdt.h>
-#include <kernel/cpu/idt.h>
-#include <kernel/hw/console.h>
-#include <kernel/hw/keyboard.h>
-#include <kernel/hw/timer.h>
-#include <kernel/hw/tsc.h>
-#include <kernel/hw/msr.h>
-#include <kernel/lib/iolib.h>
-#include <kernel/mem/phymem.h>
-#include <kernel/ui/shell.h>
-#include <kernel/util/util.h>
+#include <intr.h>
+#include <gdt.h>
+#include <idt.h>
+#include <console.h>
+#include <keyboard.h>
+#include <timer.h>
+#include <tsc.h>
+#include <msr.h>
+#include <iolib.h>
+#include <phymem.h>
+#include <shell.h>
+#include <util.h>
 
 #ifdef UNIT_TEST
-#include <kernel/test/unit_test.h>
+#include <test/unit_test.h>
 #endif
 
 // Kernel entry is jumped to from boot loader after enabling 32-bit prot execution. At this time virtual memory paging is not enabled.

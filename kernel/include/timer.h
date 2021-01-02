@@ -1,7 +1,7 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
-#include <kernel/cpu/intr.h>
+#include <stddef.h>
+#include <intr.h>
 
 #define TIMER_HZ 50
 

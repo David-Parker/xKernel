@@ -1,7 +1,7 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
-#include <kernel/lib/ds.h>
+#include <stddef.h>
+#include <ds.h>
 
 void shell_handle_user_input(ring_buffer_t* user_input);
 void shell_parse_user_input(ring_buffer_t* user_input);

@@ -1,4 +1,4 @@
-#include <kernel/hw/cpuid.h>
+#include <cpuid.h>
 
 void call_cpuid(
     _u32 cpuid,

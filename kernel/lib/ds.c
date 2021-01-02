@@ -1,5 +1,5 @@
-#include <kernel/lib/ds.h>
-#include <kernel/util/debug.h>
+#include <ds.h>
+#include <debug.h>
 
 void linked_list_init(linked_list_t* list)
 {

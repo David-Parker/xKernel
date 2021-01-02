@@ -1,7 +1,7 @@
-#include <kernel/mem/malloc.h>
-#include <kernel/mem/phymem.h>
-#include <kernel/util/debug.h>
-#include <kernel/util/util.h>
+#include <malloc.h>
+#include <phymem.h>
+#include <debug.h>
+#include <util.h>
 
 _u8* __malloc_heap = (_u8*)PHY_KERNEL_HEAP;
 

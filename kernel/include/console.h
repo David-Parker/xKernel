@@ -1,7 +1,7 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
-#include <kernel/lib/ds.h>
+#include <stddef.h>
+#include <ds.h>
 
 // Writes to a character frame buffer while booted in text mode
 // More on text mode: https://en.wikipedia.org/wiki/Text_mode

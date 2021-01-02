@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/util/stddef.h>
+#include <stddef.h>
 
 #define MSR_PLATFORM_INFO   0x000000ce
 

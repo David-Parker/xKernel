@@ -1,8 +1,8 @@
-#include <kernel/hw/tsc.h>
-#include <kernel/hw/msr.h>
-#include <kernel/hw/cpuid.h>
-#include <kernel/hw/timer.h>
-#include <kernel/lib/iolib.h>
+#include <tsc.h>
+#include <msr.h>
+#include <cpuid.h>
+#include <timer.h>
+#include <iolib.h>
 
 static _u64 g_cycles_hz = 0;
 

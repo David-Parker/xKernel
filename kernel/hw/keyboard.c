@@ -1,8 +1,8 @@
-#include <kernel/hw/keyboard.h>
-#include <kernel/lib/iolib.h>
-#include <kernel/hw/ioports.h>
-#include <kernel/hw/console.h>
-#include <kernel/ui/shell.h>
+#include <keyboard.h>
+#include <iolib.h>
+#include <ioports.h>
+#include <console.h>
+#include<shell.h>
 
 char keyboard_map[128] =
 {

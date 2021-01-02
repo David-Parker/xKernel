@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdarg.h>
-#include <kernel/util/stddef.h>
+#include <stddef.h>
 #define PRINTF_BUFFER_MAX 4096
 #define isdigit(c) ((unsigned) ((c) - '0') < 10U)
 
@@ -18,7 +18,4 @@ void kprint(char* str);
 void kprintf(const char *fmt, ...);
 void ksprintf(const char *fmt, char* buffer, int buf_len, ...);
 void vkprintf(const char *fmt, char* buffer, int buf_len, va_list args);
-bool strcmp(char* lhs, char* rhs);
-int strlen(char* str);
-bool str_startswith(char* lhs, char* rhs);
 int sscanf(const char *str, const char *format, ...);
