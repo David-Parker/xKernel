@@ -19,6 +19,15 @@ SECTION .text
     call load_disk
     add sp, 4
 
+    ; enable A20 line
+    in al, 0x92
+    test al, 2
+    jnz after
+    or al, 2
+    and al, 0xFE
+    out 0x92, al
+    after:
+
     call switch_to_pm
 
     jmp $ ; infinite loop
