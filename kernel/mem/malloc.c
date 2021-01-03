@@ -40,5 +40,8 @@ void* kcalloc(size_t bytes)
 
 void free(void* addr)
 {
-    kassert(addr != NULL);
+    if (addr == NULL)
+    {
+        return;
+    }
 }

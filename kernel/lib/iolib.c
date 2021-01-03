@@ -1,6 +1,7 @@
 #include <iolib.h>
-#include <console.h>
 #include <string.h>
+#include <unistd.h>
+#include <debug.h>
 
 const char charMapLower[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 const char charMapUpper[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -141,6 +142,7 @@ char* lltoa_unsigned(char* destination, char* end, unsigned long long c, int bas
     }
 }
 
+// TODO: Write to stdout using fs not tty directly
 void kprint(char* str)
 {
     if (str == NULL)
@@ -152,7 +154,7 @@ void kprint(char* str)
     
     while ((c = *str++) != 0)
     {
-        console_putc(c);
+        kassert(write(stdout, c) == 1);
     }
 }
 

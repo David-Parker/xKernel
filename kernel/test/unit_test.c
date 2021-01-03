@@ -824,13 +824,6 @@ void test_driver()
 
     int n_tests = test_no;
 
-    _u8 color_console = vga_console_color;
-    _u8 color_font = vga_font_color;
-
-    kprintf("%d %d\n", color_console, color_font);
-
-    halt();
-
     for (int i = 0; i < n_tests; ++i)
     {
         kprintf("[%d/%d] ", i+1, n_tests);
@@ -838,16 +831,12 @@ void test_driver()
         if (unit_tests[i].func() == true)
         {
             passed++;
-            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_GREEN);
             kprintf("PASSED ");
-            console_set_colors(color_console, color_font);
             kprintf("%s()\n", unit_tests[i].str);
         }
         else
         {
-            console_set_colors(VGA_COLOR_BLACK, VGA_COLOR_RED);
             kprintf("FAILED ");
-            console_set_colors(color_console, color_font);
             kprintf("%s()\n", unit_tests[i].str);
         }
     }

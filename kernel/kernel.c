@@ -10,6 +10,7 @@
 #include <phymem.h>
 #include <shell.h>
 #include <util.h>
+#include <tty.h>
 
 #ifdef UNIT_TEST
 #include <test/unit_test.h>
@@ -23,7 +24,8 @@ void kmain() {
     intr_init();
     timer_init();
     keyboard_init();
-    console_init();
+    tty_init(&tty_default, 1024, VGA_MAX_ROWS - 1, VGA_MAX_COLS);
+    console_init(&tty_default);
     intr_enable();
    // get_tsc_freq();
 

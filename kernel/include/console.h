@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <ds.h>
+#include <tty.h>
 
 // Writes to a character frame buffer while booted in text mode
 // More on text mode: https://en.wikipedia.org/wiki/Text_mode
@@ -28,34 +29,23 @@
 
 #define VGA_MAX_ROWS 25
 #define VGA_MAX_COLS 80
-#define VIDEO_BUFFER_ROWS 4096
-
-#define VIDEO_RING_WINDOW_SIZE (VGA_MAX_ROWS - 1)
 
 #define VGA_CONSOLE_FONT_COLOR(console, font) (console << 4) | font
 
-typedef struct console_line
-{
-    char str[(VGA_MAX_COLS * 2) + 1];
-    bool read_only;
-} console_line_t;
-
 typedef char* screen_ptr_t;
-_u8 vga_console_color;
-_u8 vga_font_color;
-int vga_row_curr;
-int vga_col_curr;
+static _u8 vga_console_color;
+static _u8 vga_font_color;
+static int vga_row_curr;
+static int vga_col_curr;
+static tty_t* tty_current;
 
 static void print_marquee();
 static void reset_reader();
 
-void console_init();
-void console_clear();
+void console_init(tty_t* tty);
+void console_redraw();
+void console_reset();
 void console_flush();
-void console_putc(char c);
-void console_popc();
+void console_read_from_tty();
 void console_simple_print(int row, char* str);
 void console_set_colors(_u8 console, _u8 font);
-void console_scroll_n(int n);
-void console_scroll_up();
-void console_scroll_down();

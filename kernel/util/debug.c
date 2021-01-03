@@ -10,7 +10,7 @@ void kpanic(char* message)
     loops++;
     if (loops == 1)
     {
-        console_clear();
+        console_redraw();
         console_simple_print(0, "Kernel panic invoked, shutting down kernel.");
         console_simple_print(1, message);
     }

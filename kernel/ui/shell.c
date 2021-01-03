@@ -1,12 +1,13 @@
 #include <shell.h>
 #include <util.h>
 #include <keyboard.h>
-#include <console.h>
 #include <iolib.h>
 #include <malloc.h>
 #include <test/unit_test.h>
 #include <debug.h>
 #include <string.h>
+#include <unistd.h>
+#include <console.h>
 
 void shell_handle_user_input(ring_buffer_t* user_input)
 {
@@ -23,24 +24,24 @@ void shell_handle_user_input(ring_buffer_t* user_input)
     switch (key)
     {
         case KEY_BACKSPACE:
-            console_popc();
-            console_flush();
+            write(stdout, KEY_BACKSPACE);
             break;
         case KEY_ENTER:
-            console_putc('\n');
+            write(stdout, '\n');
             shell_parse_user_input(user_input);
             break;
         case KEY_PAGE_UP:
-            console_scroll_n(VIDEO_RING_WINDOW_SIZE);
+            write(stdout, KEY_PAGE_UP);
             break;
         case KEY_PAGE_DOWN:
-            console_scroll_n(-(VIDEO_RING_WINDOW_SIZE));
+            write(stdout, KEY_PAGE_DOWN);
             break;
         default:
-            console_putc(keyboard_map[key]);
-            console_flush();
+            write(stdout, keyboard_map[key]);
             break;
     }
+
+    console_flush();
 }
 
 // Parses a stream of keycodes (this is not neccessarily what is displayed on the screen currently)
@@ -93,7 +94,7 @@ void shell_handle_command(char* cmd)
     }
     else if (strcmp(cmd, "cls"))
     {
-        console_clear();
+        console_reset();
     }
     else if (strcmp(cmd, "sig"))
     {
