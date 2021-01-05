@@ -45,31 +45,69 @@ void* allocate_new_block(size_t bytes)
 // World's simplest malloc function. 100% leak. Enough to be unblocked for now...
 void* kmalloc(size_t bytes)
 {
-    // Scan blocks for free block
+    // Scan blocks for a free block
     linked_list_node_t* curr = blocks.head;
+    m_block_t* block = NULL;
 
     while (curr != blocks.head->prev)
     {
-        m_block_t* block = list_entry(curr, m_block_t, elem);
+        m_block_t* b = list_entry(curr, m_block_t, elem);
 
-        if (block->is_free && block->size >= bytes)
+        if (b->is_free)
         {
-            block->is_free = false;
+            // Check neighbors if they are free and coalesce
+            if (curr->prev != curr)
+            {
+                m_block_t* b_last = list_entry(curr->prev, m_block_t, elem);
 
-            return ((_u8*)block)+sizeof(m_block_t);
+                if (b_last->is_free)
+                {
+                    int new_size = sizeof(m_block_t) + b_last->size + b->size;
+                    m_block_t* new_block = b_last;
+                    new_block->size = new_size;
+                    b = new_block;
+                    linked_list_node_t* temp = curr->prev;
+                    linked_list_remove(&blocks, curr);
+                    curr = temp;
+                }
+            }
+
+            if (curr->next != curr)
+            {
+                m_block_t* b_next = list_entry(curr->next, m_block_t, elem);
+
+                if (b_next->is_free)
+                {
+                    int new_size = sizeof(m_block_t) + b_next->size + b->size;
+                    b->size = new_size;
+                    linked_list_remove(&blocks, curr->next);
+                }
+            }
+
+            if (b->size >= bytes)
+            {
+                b->is_free = false;
+
+                block = b;
+
+                break;
+            }
         }
 
         curr = curr->next;
     }
 
-    // No large enough free blocks found, create a new one
-    void* data = allocate_new_block(sizeof(m_block_t) + bytes);
+    if (block == NULL)
+    {
+        // No large enough free blocks found, create a new one
+        void* data = allocate_new_block(sizeof(m_block_t) + bytes);
 
-    m_block_t* block = (m_block_t*)data;
+        block = (m_block_t*)data;
 
-    block->size = bytes;
-    block->is_free = false;
-    linked_list_add_back(&blocks, &block->elem);
+        block->size = bytes;
+        block->is_free = false;
+        linked_list_add_back(&blocks, &block->elem);
+    }
 
     return ((_u8*)block)+sizeof(m_block_t);
 }
