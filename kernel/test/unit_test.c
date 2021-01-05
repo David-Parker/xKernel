@@ -523,6 +523,8 @@ bool malloc_aligned_one_byte()
 
     tassert((size_t)mem % 8 == 0);
 
+    free(mem);
+
     return true;
 }
 
@@ -531,6 +533,8 @@ bool malloc_aligned_large()
     int* mem = (int*)kmalloc(4096 * sizeof(int));
 
     tassert((size_t)mem % 8 == 0);
+
+    free(mem);
 
     return true;
 }
@@ -541,6 +545,7 @@ bool malloc_aligned_multi()
     {
         void* mem = kmalloc(3);
         tassert((size_t)mem % 8 == 0);
+        free (mem);
     }
 
     return true;
@@ -568,6 +573,9 @@ bool malloc_mem_corruption()
         tassert(*(buf2+i) == 0xf00df33d);
     }
 
+    free(buf1);
+    free(buf2);
+
     return true;
 }
 
@@ -575,14 +583,14 @@ bool calloc_all_zero()
 {
     int* mem = (int*)kcalloc(4096 * sizeof(int));
 
-    //kprintf("%x\n", mem);
-
     for (int i = 0; i < 4096; ++i)
     {
         tassert(*(mem+i) == 0);
     }
 
     tassert((size_t)mem % 8 == 0);
+
+    free(mem);
 
     return true;
 }
@@ -656,7 +664,6 @@ bool ring_buffer_window_reverse()
     while (i != -1)
     {
         size_t elem = ring_buffer_get(&ring, i);
-        //kprintf("%d s:%d e:%d i:%d\n", elem, ring.idx_start, ring.idx_end, i);
         tassert(elem == x--);
         i = ring_buffer_prev(&ring, i);
     }
@@ -689,6 +696,7 @@ bool ring_buffer_window_indirect()
         size_t* elem = (size_t*)ring_buffer_get(&ring, i);
         tassert(*elem == x++);
         i = ring_buffer_next(&ring, i);
+        free(elem);
     }
 
     return true;

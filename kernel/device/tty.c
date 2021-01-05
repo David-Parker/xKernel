@@ -41,6 +41,7 @@ void tty_putc(tty_t* tty, char c)
         kassert((size_t)line >= PHY_KERNEL_HEAP);
         tty_line_t* old_line = (tty_line_t*)ring_buffer_push(tty->lines, (size_t)line);
 
+        free(old_line->str);
         free(old_line);
     }
 
@@ -54,7 +55,6 @@ void tty_putc(tty_t* tty, char c)
     kassert(curr_line != NULL);
     kassert((size_t)curr_line >= PHY_KERNEL_HEAP);
 
-    //int len = strlen(curr_line->str) / 2;
     int len = strlen(curr_line->str);
 
     if (c == '\n' || len == tty->line_cols)
@@ -64,6 +64,7 @@ void tty_putc(tty_t* tty, char c)
         
         reset_reader(tty);
 
+        free(old_line->str);
         free(old_line);
     }
 
@@ -106,6 +107,7 @@ void tty_popc(tty_t* tty)
     {
         if (line_above != NULL && !line_above->read_only)
         {
+            free(curr_line->str);
             free(curr_line);
             ring_buffer_pop(tty->lines);
         }

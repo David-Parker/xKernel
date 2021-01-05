@@ -182,5 +182,5 @@ void console_set_colors(_u8 console, _u8 font)
 
 void print_marquee()
 {
-    console_simple_print(24, "xKernel v0.01                                                                   ");
+    //console_simple_print(24, "xKernel v0.01                                                                   ");
 }

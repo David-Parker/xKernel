@@ -7,8 +7,7 @@
 /* Converts pointer to list element LIST_ELEM into a pointer to
    the structure that LIST_ELEM is embedded inside.  Supply the
    name of the outer structure STRUCT and the member name MEMBER
-   of the list element.  See the big comment at the top of the
-   file for an example. */
+   of the list element. */
 #define list_entry(LIST_ELEM, STRUCT, MEMBER)           \
         ((STRUCT *) ((_u8 *) &(LIST_ELEM)->next     \
                      - offsetof (STRUCT, MEMBER.next)))
