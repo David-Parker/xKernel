@@ -19,16 +19,16 @@ void tty_init(tty_t* tty, int buf_lines, int window_len, int line_cols)
 
 void tty_putc(tty_t* tty, char c)
 {
-    // TODO use actual ascii backspace char
+    // Control characters use negative keycode values
     switch (c)
     {
-        case KEY_BACKSPACE:
+        case -KEY_BACKSPACE:
             tty_popc(tty);
             return;
-        case KEY_PAGE_UP:
+        case -KEY_PAGE_UP:
             tty_scroll(tty, tty->window_len);
             return;
-        case KEY_PAGE_DOWN:
+        case -KEY_PAGE_DOWN:
             tty_scroll(tty, -(tty->window_len));
             return;
     }
@@ -108,16 +108,10 @@ void tty_popc(tty_t* tty)
         {
             free(curr_line);
             ring_buffer_pop(tty->lines);
-
-            // int row = get_cursor_row();
-            // set_cursor_pos(get_cursor_index(row-1, 0));
         }
     }
     else
     {
-        // int row = get_cursor_row();
-        // int col = get_cursor_col();
-        // set_cursor_pos(get_cursor_index(row, col-1));
         curr_line->str[len-1] = '\0';
     }
 

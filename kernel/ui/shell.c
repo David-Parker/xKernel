@@ -24,23 +24,24 @@ void shell_handle_user_input(ring_buffer_t* user_input)
     switch (key)
     {
         case KEY_BACKSPACE:
-            write(stdout, KEY_BACKSPACE);
+            write(stdout, -KEY_BACKSPACE);
             break;
         case KEY_ENTER:
             write(stdout, '\n');
             shell_parse_user_input(user_input);
             break;
         case KEY_PAGE_UP:
-            write(stdout, KEY_PAGE_UP);
+            write(stdout, -KEY_PAGE_UP);
             break;
         case KEY_PAGE_DOWN:
-            write(stdout, KEY_PAGE_DOWN);
+            write(stdout, -KEY_PAGE_DOWN);
             break;
         default:
             write(stdout, keyboard_map[key]);
             break;
     }
 
+    // TODO: Shell should not talk to console directly
     console_flush();
 }
 
