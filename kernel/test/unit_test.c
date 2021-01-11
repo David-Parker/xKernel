@@ -579,6 +579,135 @@ bool malloc_mem_corruption()
     return true;
 }
 
+bool malloc_allocate_nospace()
+{
+    linked_list_t list;
+    linked_list_init(&list);
+    _u8 buf[16];
+    _u8* pBuf = buf;
+
+    tassert(pBuf == buf);
+    tassert(list.count == 0);
+    void* mem = kmalloc_from(1, &pBuf, buf + ARRSIZE(buf), &list);
+
+    tassert(mem == NULL);
+    tassert(list.count == 0);
+
+    return true;
+}
+
+bool malloc_allocate_free()
+{
+    linked_list_t list;
+    linked_list_init(&list);
+    _u8 buf[128];
+    _u8* pBuf = buf;
+
+    tassert(pBuf == buf);
+    tassert(list.count == 0);
+    void* mem = kmalloc_from(1, &pBuf, buf + ARRSIZE(buf), &list);
+
+    tassert(pBuf != buf);
+    tassert((size_t)mem % 8 == 0);
+    tassert(list.count == 1);
+
+    m_block_t* block = list_entry(list.head, m_block_t, elem);
+    tassert(block->size == 8);
+    tassert(block->is_free == false);
+
+    free(mem);
+
+    tassert(block->size == 8);
+    tassert(block->is_free == true);
+
+    return true;
+}
+
+bool malloc_allocate_coalecse()
+{
+    linked_list_t list;
+    linked_list_init(&list);
+    _u8 buf[512];
+    _u8* pBuf = buf;
+    void* blocks[3];
+
+    tassert(pBuf == buf);
+    tassert(list.count == 0);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        blocks[i] = kmalloc_from(1, &pBuf, buf + ARRSIZE(buf), &list);
+        tassert((size_t)blocks[i] % 8 == 0);
+    }
+
+    tassert(pBuf != buf);
+    tassert(list.count == 3);
+
+    linked_list_node_t* curr = list.head;
+
+    while (curr != list.head->prev)
+    {
+        m_block_t* block = list_entry(curr, m_block_t, elem);
+        tassert(block->size == 8);
+        tassert(block->is_free == false);
+        curr = curr->next;
+    }
+
+    for (int i = 0; i < 3; ++i)
+    {
+        free(blocks[i]);
+    }
+
+    curr = list.head;
+
+    while (curr != list.head->prev)
+    {
+        m_block_t* block = list_entry(curr, m_block_t, elem);
+        tassert(block->size == 8);
+        tassert(block->is_free == true);
+        curr = curr->next;
+    }
+
+    // 3 free blocks, next alloc should coalesce
+    void* mem = kmalloc_from(3, &pBuf, buf + ARRSIZE(buf), &list);
+    tassert(list.count == 1);
+    
+    m_block_t* block = list_entry(list.head, m_block_t, elem);
+    tassert(block->is_free == false);
+    tassert(block->size == 24 + (2 * sizeof(m_block_t)));
+
+    return true;
+}
+
+bool malloc_allocate_subdivide()
+{
+    linked_list_t list;
+    linked_list_init(&list);
+    _u8 buf[512];
+    _u8* pBuf = buf;
+
+    void* mem = kmalloc_from(256, &pBuf, buf + ARRSIZE(buf), &list);
+    m_block_t* block = list_entry(list.head, m_block_t, elem);
+    tassert(block->size == 256);
+    tassert(list.count == 1);
+
+    free(mem);
+
+    // 256 block should be subdivided
+    void* mem2 = kmalloc_from(8, &pBuf, buf + ARRSIZE(buf), &list);
+    tassert(mem == mem2);
+
+    block = list_entry(list.head, m_block_t, elem);
+
+    tassert(block->size == 8);
+    tassert(list.count == 2);
+
+    block = list_entry(list.head->next, m_block_t, elem);
+    tassert(block->size == 256 - 8 - sizeof(m_block_t));
+
+    return true;
+}
+
 bool calloc_all_zero()
 {
     int* mem = (int*)kcalloc(4096 * sizeof(int));
@@ -813,6 +942,10 @@ void test_init()
     TEST_FUNC(malloc_aligned_large);
     TEST_FUNC(malloc_aligned_multi);
     TEST_FUNC(malloc_mem_corruption);
+    TEST_FUNC(malloc_allocate_free);
+    TEST_FUNC(malloc_allocate_nospace);
+    TEST_FUNC(malloc_allocate_coalecse);
+    TEST_FUNC(malloc_allocate_subdivide);
     TEST_FUNC(calloc_all_zero);
     TEST_FUNC(ring_buffer_spin);
     TEST_FUNC(ring_buffer_window);
@@ -825,6 +958,8 @@ void test_driver()
 {
     test_no = 0;
     test_init();
+
+    intr_disable();
 
     int passed = 0;
 
@@ -848,6 +983,8 @@ void test_driver()
             kprintf("%s()\n", unit_tests[i].str);
         }
     }
+
+    intr_enable();
 
     kprintf("%d out of %d tests passed.\n", passed, n_tests);
 }

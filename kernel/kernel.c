@@ -24,7 +24,7 @@ void kmain() {
     intr_init();
     timer_init();
     keyboard_init();
-    tty_init(&tty_default, 50, VGA_MAX_ROWS - 1, VGA_MAX_COLS);
+    tty_init(&tty_default, 1024, VGA_MAX_ROWS - 1, VGA_MAX_COLS);
     console_init(&tty_default);
     intr_enable();
    // get_tsc_freq();

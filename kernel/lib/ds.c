@@ -9,7 +9,8 @@ void linked_list_init(linked_list_t* list)
 
 void linked_list_add_back(linked_list_t* list, linked_list_node_t* toAdd)
 {
-    kassert(list != NULL && toAdd != NULL);
+    kassert(list != NULL);
+    kassert(toAdd != NULL);
 
     if (list->head == NULL)
     {
@@ -17,15 +18,14 @@ void linked_list_add_back(linked_list_t* list, linked_list_node_t* toAdd)
     }
     else
     {
-        linked_list_add_before(list->head, toAdd);
+        linked_list_add_before(list, list->head, toAdd);
     }
-
-    list->count++;
 }
 
 void linked_list_add_front(linked_list_t* list, linked_list_node_t* toAdd)
 {
-    kassert(list != NULL && toAdd != NULL);
+    kassert(list != NULL);
+    kassert(toAdd != NULL);
 
     if (list->head == NULL)
     {
@@ -33,16 +33,15 @@ void linked_list_add_front(linked_list_t* list, linked_list_node_t* toAdd)
     }
     else
     {
-        linked_list_add_before(list->head, toAdd);
+        linked_list_add_before(list, list->head, toAdd);
         list->head = toAdd;
     }
-
-    list->count++;
 }
 
 void linked_list_remove(linked_list_t* list, linked_list_node_t* toRemove)
 {
-    kassert(list != NULL && toRemove != NULL);
+    kassert(list != NULL);
+    kassert(toRemove != NULL);
 
     if (toRemove->next == toRemove)
     {
@@ -62,19 +61,28 @@ void linked_list_remove(linked_list_t* list, linked_list_node_t* toRemove)
     list->count--;
 }
 
-static void linked_list_add_before(linked_list_node_t* node, linked_list_node_t* toAdd)
+void linked_list_add_before(linked_list_t* list, linked_list_node_t* node, linked_list_node_t* toAdd)
 {
     toAdd->next = node;
     toAdd->prev = node->prev;
     node->prev->next = toAdd;
     node->prev = toAdd;
+
+    list->count++;
 }
 
-static void linked_list_add_empty(linked_list_t* list, linked_list_node_t* toAdd)
+void linked_list_add_after(linked_list_t* list, linked_list_node_t* node, linked_list_node_t* toAdd)
+{
+    linked_list_add_before(list, node->next, toAdd);
+}
+
+void linked_list_add_empty(linked_list_t* list, linked_list_node_t* toAdd)
 {
     list->head = toAdd;
     list->head->next = toAdd;
     list->head->prev = toAdd;
+
+    list->count++;
 }
 
 void ring_buffer_init(ring_buffer_t* ring, size_t* buffer, int buf_len, int ring_len)

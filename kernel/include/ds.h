@@ -27,7 +27,9 @@ void linked_list_init(linked_list_t* list);
 void linked_list_add_back(linked_list_t* list, linked_list_node_t* toAdd);
 void linked_list_add_front(linked_list_t* list, linked_list_node_t* toAdd);
 void linked_list_remove(linked_list_t* list, linked_list_node_t* toRemove);
-static void linked_list_add_before(linked_list_node_t* node, linked_list_node_t* toAdd);
+
+void linked_list_add_before(linked_list_t* list, linked_list_node_t* node, linked_list_node_t* toAdd);
+void linked_list_add_after(linked_list_t* list, linked_list_node_t* node, linked_list_node_t* toAdd);
 static void linked_list_add_empty(linked_list_t* list, linked_list_node_t* toAdd);
 
 typedef struct ring_buffer
