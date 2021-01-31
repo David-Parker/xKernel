@@ -8,7 +8,7 @@
 #define kassert(cond) \
 do { \
     if (!(cond)) { \
-        char buf[512]; \
+        char buf[128]; \
         ksprintf("Assertion failed at %s %s:%d", buf, ARRSIZE(buf), __FILE__, __func__, __LINE__); \
         kpanic(buf);\
     } \

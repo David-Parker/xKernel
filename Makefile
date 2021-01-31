@@ -10,7 +10,7 @@ GDB = gdb
 LD = /usr/local/i686elfgcc/bin/i686-elf-ld
 INC=-I./kernel/include
 # -g: Use debugging symbols in gcc
-CFLAGS = -g -std=c99
+CFLAGS = -g -std=c99 -Os
 
 DIRS=${BINDIR} ${BINDIR}/iso
 $(shell rm -rf $(DIRS))

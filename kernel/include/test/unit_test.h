@@ -11,7 +11,7 @@ typedef struct
 } unit_test_func;
 
 int test_no;
-unit_test_func unit_tests[256];
+unit_test_func unit_tests[128];
 
 #define TEST_FUNC(name) \
 do { \
