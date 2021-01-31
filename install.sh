@@ -7,6 +7,7 @@ export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 
 # binutils
+mkdir /tmp
 mkdir /tmp/src
 cd /tmp/src
 curl -O https://ftp.gnu.org/gnu/binutils/binutils-2.34.tar.gz # If the link 404's, look for a more recent version

@@ -83,7 +83,7 @@ void console_init(tty_t* tty)
 
     tty_current = tty;
     vga_console_color = VGA_COLOR_BLACK;
-    vga_font_color = VGA_COLOR_WHITE;
+    vga_font_color = VGA_COLOR_LIGHT_GREEN;
     console_redraw();
 }
 
@@ -118,21 +118,16 @@ void console_reset()
 
 void console_read_from_tty()
 {
-    if (tty_current->r_lines->idx_start == tty_current->r_lines->idx_end)
-    {
-        return;
-    }
-
     console_redraw();
     screen_ptr_t video_memory;
     int i = tty_current->r_lines->idx_start;
     int row = 0;
     int col = 0;
     int cur_idx = 0;
+    tty_line_t* elem = NULL;
 
-    while (i != -1)
+    while (tty_read(tty_current, &i, &elem))
     {
-        tty_line_t* elem = (tty_line_t*)ring_buffer_get(tty_current->r_lines, i);
         char* str = elem->str;
 
         col = 0;
@@ -152,8 +147,6 @@ void console_read_from_tty()
 
         row++;
         clamp_values(&row, &col);
-
-        i = ring_buffer_next(tty_current->r_lines, i);
     }
 
     set_cursor_pos(cur_idx);
@@ -168,7 +161,7 @@ void console_simple_print(int row, char* str)
     while (*str != '\0')
     {
         *(video_memory) = *str++;
-        *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(VGA_COLOR_BLACK, VGA_COLOR_WHITE);
+        *(video_memory+1) = VGA_CONSOLE_FONT_COLOR(vga_console_color, vga_font_color);
         video_memory+=2;
     }
 }
@@ -182,5 +175,5 @@ void console_set_colors(_u8 console, _u8 font)
 
 void print_marquee()
 {
-    //console_simple_print(24, "xKernel v0.01                                                                   ");
+    console_simple_print(24, "xKernel v0.01                                                                   ");
 }

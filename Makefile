@@ -26,7 +26,7 @@ os-image.bin: boot/mbr.bin boot/bootloader.bin kernel.bin kernel.elf
 
 # Installs tool dependencies then builds a cross compiler for i686 32-bit architecture
 packages:
-	sudo apt-get install qemu-kvm qemu virt-manager virt-viewer libvirt-bin nasm libgmp3-dev libmpfr-dev libmpc-dev texinfo gcc 
+	sudo apt install qemu qemu-kvm virt-manager curl nasm libgmp3-dev libmpfr-dev libmpc-dev texinfo gcc g++
 	sudo sh ./install.sh
 
 virt: iso

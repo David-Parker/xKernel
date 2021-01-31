@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stddef.h>
-#include <ds.h>
 #include <tty.h>
 
 // Writes to a character frame buffer while booted in text mode

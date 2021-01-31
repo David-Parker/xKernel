@@ -159,6 +159,27 @@ void tty_scroll(tty_t* tty, int n)
     }
 }
 
+bool tty_read(tty_t* tty, int* in_out_index, tty_line_t** out_elem)
+{
+    if (tty->r_lines->idx_start == tty->r_lines->idx_end)
+    {
+        return false;
+    }
+
+    int i = *in_out_index;
+
+    if (i == -1)
+    {
+        return false;
+    }
+
+    *out_elem = (tty_line_t*)ring_buffer_get(tty->r_lines, i);
+
+    *in_out_index = ring_buffer_next(tty->r_lines, i);
+
+    return true;
+}
+
 tty_line_t* create_line(int str_len)
 {
     tty_line_t* line = (tty_line_t*)kmalloc(sizeof(tty_line_t));

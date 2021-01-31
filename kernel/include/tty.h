@@ -25,6 +25,7 @@ void tty_putc(tty_t* tty, char c);
 void tty_popc(tty_t* tty);
 void tty_clear(tty_t* tty);
 void tty_scroll(tty_t* tty, int n);
+bool tty_read(tty_t* tty, int* in_out_index, tty_line_t** out_elem);
 
 static tty_line_t* create_line(int str_len);
 static void reset_reader(tty_t* tty);
