@@ -12,6 +12,9 @@
         ((STRUCT *) ((_u8 *) &(LIST_ELEM)->next     \
                      - offsetof (STRUCT, MEMBER.next)))
 
+
+#define VECTOR_GET_GENERIC(this, idx, type) *((type*)vector_elem_at(&this, idx))
+
 typedef struct linked_list_node {
     struct linked_list_node* next;
     struct linked_list_node* prev;
@@ -55,3 +58,20 @@ int ring_buffer_next(ring_buffer_t* ring, int read_idx);
 int ring_buffer_prev(ring_buffer_t* ring, int read_idx);
 int ring_buffer_idx(ring_buffer_t* ring, int read_idx);
 int ring_buffer_distance(int start_idx, int end_idx, int buf_len);
+
+/*
+    Generic, dynamically expanding array.
+*/
+typedef struct vector
+{
+    _u8* buffer;
+    _u64 count;
+    _u64 size;
+    _u64 sizeof_T;
+} vector_t;
+
+void vector_init(vector_t* this, _u64 init_size, _u64 sizeof_T);
+void vector_deallocate(vector_t* this);
+void vector_clear(vector_t* this);
+void vector_push_back(vector_t* this, void* data);
+void* vector_elem_at(vector_t* this, _u64 index);
