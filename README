@@ -1,5 +1,7 @@
 xKernel - a kernel for x86 processors. Why? Because it's fun :)
 
+![image](xkernel.jpg)
+
 To install:
 make packages
 
