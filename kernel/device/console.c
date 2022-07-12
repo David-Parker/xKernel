@@ -80,7 +80,8 @@ void set_cursor_pos(int index)
 void console_init(tty_t* tty)
 {
     kassert(tty != NULL);
-
+    
+    console_reset();
     tty_current = tty;
     vga_console_color = VGA_COLOR_BLACK;
     vga_font_color = VGA_COLOR_LIGHT_GREEN;

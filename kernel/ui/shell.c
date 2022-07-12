@@ -8,9 +8,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <console.h>
+#include <time.h>
 
+// user_input is a stream of raw keycodes
 void shell_handle_user_input(ring_buffer_t* user_input)
 {
+    // TODO: user_input is referenced in the keyboard isr
+    // there may be race conditions between this function and the isr
     if (user_input->idx_read == user_input->idx_end)
     {
         return;
@@ -42,7 +46,7 @@ void shell_handle_user_input(ring_buffer_t* user_input)
     }
 
     // TODO: Shell should not talk to console directly
-    console_flush();
+     console_flush();
 }
 
 // Parses a stream of keycodes (this is not neccessarily what is displayed on the screen currently)
@@ -59,23 +63,26 @@ void shell_parse_user_input(ring_buffer_t* user_input)
 
         size_t keycode = ring_buffer_get(user_input, read_idx);
         read_idx = ring_buffer_next(user_input, read_idx);
-
-        // skip over next char
+        
         if (keycode == KEY_BACKSPACE)
         {
+            // Skip over next char
             if (input_i > 0)
                 input[input_i--] = '\0';
-
-            continue;
         }
-
-        if (!keyboard_is_printable(keycode))
+        else if (keycode == KEY_LEFT_SHIFT)
+        {
+            // Convert character to it's alternate character
+        }
+        else if (!keyboard_is_printable(keycode))
         {
             continue;
         }
-
-        char c = keyboard_map[keycode];
-        input[input_i++] = c;
+        else
+        {
+            char c = keyboard_map[keycode];
+            input[input_i++] = c;
+        }
     }
     
     input[input_i] = '\0';
@@ -117,6 +124,22 @@ void shell_handle_command(char* cmd)
     {
         test_driver();
     }
+    else if (strcmp(cmd, "time"))
+    {
+        _u64 timestamp = ktime_get_ms();
+
+        _u64 days = timestamp / MILLIS_PER_SEC / 60 / 60 / 24;
+        timestamp -= days*24*60*60*MILLIS_PER_SEC;
+        _u64 hours = timestamp / MILLIS_PER_SEC / 60 / 60;
+        timestamp -= hours*60*60*MILLIS_PER_SEC;
+        _u64 mins = timestamp / MILLIS_PER_SEC / 60;
+        timestamp -= mins*60*MILLIS_PER_SEC;
+        _u64 secs = timestamp / MILLIS_PER_SEC;
+        timestamp -= secs*MILLIS_PER_SEC;
+        _u64 mils = timestamp;
+
+        kprintf("Time Elapsed: %llud %lluh %llum:%llus %llums\n", days, hours, mins, secs, mils);
+    }
 }
 
 void shell_print_help()
@@ -128,6 +151,7 @@ void shell_print_help()
     kprintf("    clr [bg] [fg]  - Changes the console colors. Color codes: 0 to 15.\n");
     kprintf("    sig            - Prints the xKernel signature.\n");
     kprintf("    test           - Run kernel unit tests.\n");
+    kprintf("    time           - Gets the time elapsed since boot.\n");
 }
 
 void shell_print_sig()

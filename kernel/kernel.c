@@ -3,6 +3,7 @@
 #include <idt.h>
 #include <console.h>
 #include <keyboard.h>
+#include <time.h>
 #include <timer.h>
 #include <tsc.h>
 #include <msr.h>
@@ -27,44 +28,12 @@ void kmain() {
     tty_init(&tty_default, 1024, VGA_MAX_ROWS - 1, VGA_MAX_COLS);
     console_init(&tty_default);
     intr_enable();
-   // get_tsc_freq();
+    tsc_init();
 
-    #ifdef UNIT_TEST
-        test_driver();
-    #endif
-        shell_print_sig();
-        kprintf("Welcome to xKernel! Type 'help' to get started.\n");
-        //_u64 tsc_freq = get_tsc_freq();
-
-        //kprintf("TSC Freq: %llu\n", tsc_freq);
-
-        while (true)
-        {
-            shell_handle_user_input(&user_input);
-            // if (timer_ticks % 18 == 0)
-            // {
-            //     kprintf("Ticks: %llu\n", timer_ticks);
-            // }
-            // curr = read_tsc();
-
-            // if (curr - last >= tsc_freq / 16)
-            // {
-            //     //kprintf("Another second has passed...\n");
-            //     last = curr;
-
-            //     // if (dir == 0)
-            //     //     console_scroll_up();
-            //     // else
-            //     //     console_scroll_down();
-            // }
-            // else if (curr - last_second >= tsc_freq)
-            // {
-            //     dir = !dir;
-            //     last_second = curr;
-            // }
-        }
-
-    // Don't let eip loose through memory...
-    while(1);
-    halt();
+    while (true)
+    {
+        //kprintf("The time is %llu\n", ktime_get_ns());
+        shell_handle_user_input(&user_input);
+        halt();
+    }
 }

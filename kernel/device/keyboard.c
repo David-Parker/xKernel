@@ -2,7 +2,7 @@
 #include <iolib.h>
 #include <ioports.h>
 #include <console.h>
-#include<shell.h>
+#include <shell.h>
 
 char keyboard_map[128] =
 {
@@ -77,7 +77,7 @@ void irq_handle_keyboard(registers_t* irq)
             return;
         }
 
-        //kprintf("%d\n", keycode);
+        // kprintf("%d\n", keycode);
 
         ring_buffer_push(&user_input, keycode);
     }

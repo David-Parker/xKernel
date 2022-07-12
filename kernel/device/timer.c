@@ -1,7 +1,9 @@
 #include <timer.h>
 #include <ioports.h>
+#include <tsc.h>
 
 _u64 timer_ticks = 0;
+_u64 tsc_last = 0;
 
 void timer_init()
 {
@@ -16,14 +18,12 @@ void timer_init()
     // Send the frequency divisor.
     write_port_byte(PORT_PIT_REG_DATA, l);
     write_port_byte(PORT_PIT_REG_DATA, h);
-}
 
-_u64 ktime_get_ns()
-{
-    return (_u64)(((double)timer_ticks/TIMER_HZ)*NANOS_PER_SEC);
+    tsc_last = read_tsc();
 }
 
 void irq_handle_timer(registers_t* irq)
 {
     timer_ticks++;
+    tsc_last = read_tsc();
 }

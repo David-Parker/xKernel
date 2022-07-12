@@ -6,7 +6,7 @@
 #define TIMER_HZ 50
 
 _u64 timer_ticks;
+_u64 tsc_last;
 
 void timer_init();
-_u64 ktime_get_ns();
 void irq_handle_timer(registers_t* irq);

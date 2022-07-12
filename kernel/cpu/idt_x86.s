@@ -92,7 +92,7 @@ irq_common_stub:
     add esp, 8      ; Cleans up the pushed error code and pushed ISR number
     iret            ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
 
-# Generate all the isr functions
+; Generate all the isr functions
 ISR_NOERRCODE 0
 ISR_NOERRCODE 1
 ISR_NOERRCODE 2
@@ -126,7 +126,7 @@ ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
 
-# Generate all the irq functions
+; Generate all the irq functions
 IRQ	0,	32
 IRQ	1,	33
 IRQ	2,	34

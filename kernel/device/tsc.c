@@ -1,10 +1,15 @@
 #include <tsc.h>
 #include <msr.h>
 #include <cpuid.h>
-#include <timer.h>
+#include <time.h>
 #include <iolib.h>
 
 static _u64 g_cycles_hz = 0;
+
+void tsc_init()
+{
+    get_tsc_freq();
+}
 
 // All about TSC: https://unix4lyfe.org/benchmarking/
 _u64 read_tscp()
@@ -82,7 +87,6 @@ _u64 get_tsc_freq()
     {
         _u64 cycles_hz = 0;
         _u64 gap = 0;
-        _u32 index;
         _u64 time;
         _u64 time1;
         _u64 time2;
@@ -90,33 +94,31 @@ _u64 get_tsc_freq()
         _u64 tsc1;
         _u64 tsc2;
 
-        for (index = 0; index < 3; index += 1)
-        {
-            tsc0 = read_tsc();
-            time = ktime_get_ns();
+        tsc0 = read_tsc();
+        time = ktime_get_timer_ns();
 
-            do {
-                time1 = ktime_get_ns();
-            } while (time1 == time);
+        // Ensure another tick has advanaced
+        do {
+            time1 = ktime_get_timer_ns();
+        } while (time1 == time);
 
-            tsc1 = read_tsc();
+        tsc1 = read_tsc();
 
-            do {
-                time2 = ktime_get_ns();
-            } while (time2 - time1 < 1 * NANOS_PER_SEC);
+        do {
+            time2 = ktime_get_timer_ns();
+        } while (time2 - time1 < 1 * NANOS_PER_SEC);
 
-            tsc2 = read_tsc();
+        tsc2 = read_tsc();
 
-            if ((gap == 0) ||
-                ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
+        if ((gap == 0) ||
+            ((tsc2 > tsc1) && (tsc2 - tsc0 < gap))) {
 
-                gap = tsc2 - tsc0;
-                cycles_hz = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
+            gap = tsc2 - tsc0;
+            cycles_hz = (tsc2 - tsc1) * (_u64)(NANOS_PER_SEC) / (time2 - time1);
 
-                // round to nearest mhz
-                cycles_hz += 1000000 / 2;
-                cycles_hz -= (cycles_hz % 1000000);
-            }
+            // round to nearest mhz
+            cycles_hz += 1000000 / 2;
+            cycles_hz -= (cycles_hz % 1000000);
         }
 
         g_cycles_hz = cycles_hz;
